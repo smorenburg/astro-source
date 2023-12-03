@@ -33,5 +33,8 @@ spec:
     controller:
       service:
         type: LoadBalancer
+      annotations:
+        service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: /healthz
+      replicaCount: 3
     admissionWebhooks:
       enabled: false
