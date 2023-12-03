@@ -26,4 +26,5 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: radius
+        namespace: radius-system
       interval: 12h
