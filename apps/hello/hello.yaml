@@ -10,7 +10,7 @@ spec:
   approvePlan: auto
   sourceRef:
     kind: GitRepository
-    name: helloworld
+    name: flux-system
   runnerPodTemplate:
     metadata:
       labels:
