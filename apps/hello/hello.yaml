@@ -1,0 +1,14 @@
+---
+apiVersion: infra.contrib.fluxcd.io/v1alpha2
+kind: Terraform
+metadata:
+  name: hello
+  namespace: flux-system
+spec:
+  approvePlan: auto
+  interval: 1m
+  path: ./terraform
+  runnerPodTemplate:
+    metadata:
+      labels:
+        azure.workload.identity/use: "true"
