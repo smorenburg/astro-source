@@ -49,6 +49,7 @@ spec:
       tag: v0.16.0-rc.3
     runner:
       image:
+        repository: ghcr.io/weaveworks/tf-runner-azure
         tag: v0.16.0-rc.3
       grpc:
         maxMessageSize: 30
