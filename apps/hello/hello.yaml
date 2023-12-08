@@ -5,9 +5,12 @@ metadata:
   name: hello
   namespace: flux-system
 spec:
-  approvePlan: auto
+  path: ./apps/hello/terraform
   interval: 1m
-  path: ./terraform
+  approvePlan: auto
+  sourceRef:
+    kind: GitRepository
+    name: helloworld
   runnerPodTemplate:
     metadata:
       labels:
