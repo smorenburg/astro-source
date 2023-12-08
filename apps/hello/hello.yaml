@@ -15,15 +15,3 @@ spec:
     metadata:
       labels:
         azure.workload.identity/use: "true"
-    spec:
-      env:
-        - name: ARM_USE_OIDC
-          value: "true"
-        - name: ARM_SUBSCRIPTION_ID
-          value: ae9db8ac-2682-4a98-ad36-7d13b2bd5a24
-        - name: ARM_TENANT_ID
-          value: 7ddc4c97-c5a0-4a29-ac83-59be0f280518
-        - name: ARM_CLIENT_ID
-          value: 8612b1b8-e15f-4f31-9630-44c71715971e
-        - name: ARM_OIDC_TOKEN_FILE_PATH
-          value: /var/run/secrets/azure/tokens/azure-identity-token
