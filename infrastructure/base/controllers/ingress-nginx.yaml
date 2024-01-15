@@ -35,7 +35,7 @@ spec:
         type: LoadBalancer
         annotations:
           service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: /healthz
-          service.beta.kubernetes.io/azure-load-balancer-resource-group: rg-jingle-neu
+          service.beta.kubernetes.io/azure-load-balancer-resource-group: rg-astro-neu
       replicaCount: 3
       ingressClassResource:
         default: true
