@@ -11,7 +11,7 @@ spec:
     - name: container_image
       value: mcr.microsoft.com/azuredocs/azure-vote-front:v1
     - name: ingress_rule_host
-      value: vote.20.123.4.196.nip.io
+      value: vote.52.169.234.0.nip.io
   runnerPodTemplate:
     spec:
       env:
@@ -20,7 +20,7 @@ spec:
         - name: ARM_SUBSCRIPTION_ID
           value: ae9db8ac-2682-4a98-ad36-7d13b2bd5a24
         - name: ARM_CLIENT_ID
-          value: 87c5379e-fd4e-4cda-997c-3a9ce66b87fb
+          value: e7ca0613-56d1-4e51-bf3a-2757116e17bc
         - name: ARM_USE_OIDC
           value: "true"
         - name: ARM_OIDC_TOKEN_FILE_PATH
