@@ -23,6 +23,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: weave-gitops
+        namespace: flux-system
       interval: 12h
   # https://github.com/weaveworks/weave-gitops/blob/main/charts/gitops-server/values.yaml
   values:
