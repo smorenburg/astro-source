@@ -11,7 +11,7 @@ spec:
     branch: main
   secretRef:
     name: flux-system
-  url: ssh://git@github.com/smorenburg/jingle-ops-source
+  url: ssh://git@github.com/smorenburg/astro-source
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
