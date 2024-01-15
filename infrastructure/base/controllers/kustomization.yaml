@@ -5,5 +5,4 @@ resources:
   - tf-controller.yaml
   - cert-manager.yaml
   - ingress-nginx.yaml
-  - network-policies.yaml
   - keycloak.yaml
