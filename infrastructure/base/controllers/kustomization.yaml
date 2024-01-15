@@ -6,3 +6,4 @@ resources:
   - cert-manager.yaml
   - ingress-nginx.yaml
   - network-policies.yaml
+  - radius.yaml
