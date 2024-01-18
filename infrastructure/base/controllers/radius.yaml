@@ -5,7 +5,7 @@ metadata:
   name: radius-system
 ---
 apiVersion: source.toolkit.fluxcd.io/v1beta2
-kind: HelmRepository
+kind: GitRepository
 metadata:
   name: radius
   namespace: radius-system
@@ -32,7 +32,7 @@ spec:
     spec:
       chart: radius
       sourceRef:
-        kind: HelmRepository
+        kind: GitRepository
         name: radius
         namespace: radius-system
       interval: 12h
