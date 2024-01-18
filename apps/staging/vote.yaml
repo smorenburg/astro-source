@@ -5,6 +5,15 @@ metadata:
   name: vote
   namespace: flux-system
 spec:
+  backendConfig:
+    customConfiguration: |
+      backend "azurerm" {
+        resource_group_name  = "rg-tfstate-astro-neu"
+        storage_account_name = "stastro052015"
+        container_name       = "tfstate"
+        key                  = "vote.staging.northeurope.tfstate"
+        use_oidc             = true
+      }
   vars:
     - name: environment
       value: staging
