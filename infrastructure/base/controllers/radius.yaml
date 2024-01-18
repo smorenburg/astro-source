@@ -13,7 +13,7 @@ spec:
   interval: 24h
   url: https://github.com/radius-project/radius
   ref:
-    branch: duplicate-key
+    branch: main
   ignore: |
     # exclude all
     /*
