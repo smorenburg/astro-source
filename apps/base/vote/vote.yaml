@@ -7,7 +7,8 @@ metadata:
 spec:
   path: ./apps/base/vote/terraform
   interval: 1m
-  timeout: 30m
+  tfstate:
+    forceUnlock: auto
   approvePlan: auto
   destroyResourcesOnDeletion: true
   sourceRef:
