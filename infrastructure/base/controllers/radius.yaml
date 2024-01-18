@@ -15,9 +15,7 @@ spec:
   ref:
     branch: main
   ignore: |
-    # exclude all
     /*
-    # include charts directory
     !/deploy/Chart/
  # url: https://radius.azurecr.io/helm/v1/repo
 ---
