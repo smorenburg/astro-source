@@ -31,7 +31,7 @@ spec:
   timeout: 1m
   chart:
     spec:
-      chart: /deploy/Chart/
+      chart: ./deploy/Chart/
       sourceRef:
         kind: GitRepository
         name: radius
