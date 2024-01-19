@@ -2,8 +2,13 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - ../base/vote
+  - ../base/snippetbox
 patches:
   - path: vote.yaml
     target:
       kind: Terraform
       name: vote
+  - path: snippetbox.yaml
+    target:
+      kind: Terraform
+      name: snippetbox
