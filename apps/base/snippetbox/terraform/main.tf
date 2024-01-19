@@ -160,7 +160,7 @@ resource "kubernetes_ingress_v1" "default" {
   spec {
     tls {
       hosts       = [var.ingress_rule_host]
-      secret_name = "tls-secret"
+      secret_name = var.app
     }
 
     rule {
