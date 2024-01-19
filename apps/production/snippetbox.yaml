@@ -18,7 +18,7 @@ spec:
     - name: environment
       value: production
     - name: container_image
-      value: smorenburg/snippetbox:0.0.1
+      value: smorenburg/snippetbox:0.0.2
     - name: ingress_rule_host
       value: snippetbox.52.169.234.0.nip.io
   runnerPodTemplate:
