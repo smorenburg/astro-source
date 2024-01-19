@@ -1,0 +1,36 @@
+---
+apiVersion: infra.contrib.fluxcd.io/v1alpha2
+kind: Terraform
+metadata:
+  name: snippetbox
+  namespace: flux-system
+spec:
+  backendConfig:
+    customConfiguration: |
+      backend "azurerm" {
+        resource_group_name  = "rg-tfstate-astro-neu"
+        storage_account_name = "stastro052015"
+        container_name       = "tfstate"
+        key                  = "snippetbox.production.northeurope.tfstate"
+        use_oidc             = true
+      }
+  vars:
+    - name: environment
+      value: production
+    - name: container_image
+      value: smorenburg/snippetbox:0.0.1
+    - name: ingress_rule_host
+      value: snippetbox.52.169.234.0.nip.io
+  runnerPodTemplate:
+    spec:
+      env:
+        - name: ARM_TENANT_ID
+          value: 7ddc4c97-c5a0-4a29-ac83-59be0f280518
+        - name: ARM_SUBSCRIPTION_ID
+          value: ae9db8ac-2682-4a98-ad36-7d13b2bd5a24
+        - name: ARM_CLIENT_ID
+          value: e7ca0613-56d1-4e51-bf3a-2757116e17bc
+        - name: ARM_USE_OIDC
+          value: "true"
+        - name: ARM_OIDC_TOKEN_FILE_PATH
+          value: /var/run/secrets/azure/tokens/azure-identity-token

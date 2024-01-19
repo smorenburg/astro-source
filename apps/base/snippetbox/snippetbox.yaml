@@ -1,0 +1,20 @@
+---
+apiVersion: infra.contrib.fluxcd.io/v1alpha2
+kind: Terraform
+metadata:
+  name: snippetbox
+  namespace: flux-system
+spec:
+  path: ./apps/base/snippetbox/terraform
+  interval: 1m
+  tfstate:
+    forceUnlock: auto
+  approvePlan: auto
+  destroyResourcesOnDeletion: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  runnerPodTemplate:
+    metadata:
+      labels:
+        azure.workload.identity/use: "true"
