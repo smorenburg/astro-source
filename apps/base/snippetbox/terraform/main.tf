@@ -44,9 +44,13 @@ data "terraform_remote_state" "environment" {
 # TODO: Add comments.
 data "atlas_schema" "default" {
   src     = file("templates/schema.hcl")
-  dev_url = "mysql://root@mysql-schema.snippetbox.svc.cluster.local:3306"
-
-  depends_on = [kubernetes_service_v1.mysql_schema]
+  dev_url = join("", [
+    "mysql://root@",
+    kubernetes_service_v1.mysql_schema.metadata[0].name,
+    ".",
+    kubernetes_namespace_v1.default.metadata[0].name,
+    ".svc.cluster.local:3306"
+  ])
 }
 
 locals {
@@ -109,8 +113,13 @@ resource "azurerm_mysql_flexible_server_firewall_rule" "allow_all" {
 }
 
 resource "atlas_schema" "default" {
-  url = "mysql://mysqladmin:${urlencode(random_password.mysqladmin.result)}@${azurerm_mysql_flexible_server.default.fqdn}:3306?tls=preferred"
   hcl = data.atlas_schema.default.hcl
+  url = join("", [
+    "mysql://mysqladmin:",
+    urlencode(random_password.mysqladmin.result),
+    "@",
+    azurerm_mysql_flexible_server.default.fqdn, ":3306?tls=preferred"
+  ])
 
   depends_on = [azurerm_mysql_flexible_server_firewall_rule.allow_all]
 }
