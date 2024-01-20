@@ -44,6 +44,10 @@ resource "random_id" "redis" {
 resource "azurerm_resource_group" "default" {
   name     = "rg-${local.suffix}"
   location = var.location
+
+  tags = {
+    part-of = var.app
+  }
 }
 
 # Create the Azure Cache for Redis.
@@ -56,6 +60,11 @@ resource "azurerm_redis_cache" "default" {
   sku_name            = "Standard"
   enable_non_ssl_port = true
   minimum_tls_version = "1.2"
+
+  tags = {
+    component = "database"
+    part-of   = var.app
+  }
 }
 
 # Create the Kubernetes namespace.
@@ -119,7 +128,7 @@ resource "kubernetes_deployment_v1" "default" {
           }
 
           env {
-#           # TODO: Store the access key in a secret.
+            #           # TODO: Store the access key in a secret.
             name  = "REDIS_PWD"
             value = azurerm_redis_cache.default.primary_access_key
           }

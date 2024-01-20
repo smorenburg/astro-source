@@ -29,7 +29,7 @@ provider "azurerm" {
 
 # TODO: Add comments.
 provider "atlas" {
-  dev_url = "mysql://root@mysql-atlas.snippetbox.svc.cluster.local:3306"
+  dev_url = "mysql://root@mysql-schema.snippetbox.svc.cluster.local:3306"
 }
 
 data "azurerm_client_config" "current" {}
@@ -80,6 +80,10 @@ resource "azurerm_key_vault_secret" "mysqladmin" {
 resource "azurerm_resource_group" "default" {
   name     = "rg-${local.suffix}"
   location = var.location
+
+  tags = {
+    part-of = var.app
+  }
 }
 
 resource "azurerm_mysql_flexible_server" "default" {
@@ -90,6 +94,11 @@ resource "azurerm_mysql_flexible_server" "default" {
   administrator_password = random_password.mysqladmin.result
   sku_name               = "B_Standard_B1s"
   zone                   = "1"
+
+  tags = {
+    component = "database"
+    part-of   = var.app
+  }
 }
 
 resource "azurerm_mysql_flexible_server_firewall_rule" "allow_all" {
@@ -120,13 +129,13 @@ resource "kubernetes_namespace_v1" "default" {
 }
 
 # Create the mysql-atlas Kubernetes deployment.
-resource "kubernetes_deployment_v1" "mysql_atlas" {
+resource "kubernetes_deployment_v1" "mysql_schema" {
   metadata {
-    name      = "mysql-atlas"
+    name      = "mysql-schema"
     namespace = kubernetes_namespace_v1.default.metadata[0].name
 
     labels = {
-      name      = "mysql-atlas"
+      name      = "mysql-schema"
       component = "database"
       part-of   = var.app
     }
@@ -137,7 +146,7 @@ resource "kubernetes_deployment_v1" "mysql_atlas" {
 
     selector {
       match_labels = {
-        name      = "mysql-atlas"
+        name      = "mysql-schema"
         component = "database"
         part-of   = var.app
       }
@@ -146,7 +155,7 @@ resource "kubernetes_deployment_v1" "mysql_atlas" {
     template {
       metadata {
         labels = {
-          name      = "mysql-atlas"
+          name      = "mysql-schema"
           component = "database"
           part-of   = var.app
         }
@@ -155,7 +164,7 @@ resource "kubernetes_deployment_v1" "mysql_atlas" {
       spec {
         container {
           image = "mysql:8"
-          name  = "mysql-atlas"
+          name  = "mysql-schema"
 
           port {
             container_port = 3306
@@ -192,13 +201,13 @@ resource "kubernetes_deployment_v1" "mysql_atlas" {
 }
 
 # Create the mysql-atlas Kubernetes service.
-resource "kubernetes_service_v1" "mysql_atlas" {
+resource "kubernetes_service_v1" "mysql_schema" {
   metadata {
-    name      = "mysql-atlas"
+    name      = "mysql-schema"
     namespace = kubernetes_namespace_v1.default.metadata[0].name
 
     labels = {
-      name      = "mysql-atlas"
+      name      = "mysql-schema"
       component = "database"
       part-of   = var.app
     }
@@ -206,7 +215,7 @@ resource "kubernetes_service_v1" "mysql_atlas" {
 
   spec {
     selector = {
-      name      = "mysql-atlas"
+      name      = "mysql-schema"
       component = "database"
       part-of   = var.app
     }
