@@ -27,6 +27,7 @@ provider "azurerm" {
   }
 }
 
+# TODO: Add comments.
 provider "atlas" {
   dev_url = "mysql://root@mysql-atlas.snippetbox.svc.cluster.local:3306"
 }
