@@ -64,7 +64,8 @@ resource "kubernetes_namespace_v1" "default" {
     name = var.app
 
     labels = {
-      app = var.app
+      name    = var.app
+      part-of = var.app
     }
   }
 }
@@ -76,7 +77,9 @@ resource "kubernetes_deployment_v1" "default" {
     namespace = kubernetes_namespace_v1.default.metadata[0].name
 
     labels = {
-      app = var.app
+      name      = var.app
+      component = "server"
+      part-of   = var.app
     }
   }
 
@@ -85,14 +88,18 @@ resource "kubernetes_deployment_v1" "default" {
 
     selector {
       match_labels = {
-        app = var.app
+        name      = var.app
+        component = "server"
+        part-of   = var.app
       }
     }
 
     template {
       metadata {
         labels = {
-          app = var.app
+          name      = var.app
+          component = "server"
+          part-of   = var.app
         }
       }
 
@@ -148,13 +155,17 @@ resource "kubernetes_service_v1" "default" {
     namespace = kubernetes_namespace_v1.default.metadata[0].name
 
     labels = {
-      app = var.app
+      name      = var.app
+      component = "server"
+      part-of   = var.app
     }
   }
 
   spec {
     selector = {
-      app = var.app
+      name      = var.app
+      component = "server"
+      part-of   = var.app
     }
 
     port {
@@ -171,7 +182,8 @@ resource "kubernetes_ingress_v1" "default" {
     namespace = kubernetes_namespace_v1.default.metadata[0].name
 
     labels = {
-      app = var.app
+      name    = var.app
+      part-of = var.app
     }
 
     annotations = {

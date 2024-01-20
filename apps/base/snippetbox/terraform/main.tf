@@ -126,7 +126,7 @@ resource "kubernetes_deployment_v1" "mysql_atlas" {
 
     labels = {
       name      = "mysql-atlas"
-      component = "schema"
+      component = "database"
       part-of   = var.app
     }
   }
@@ -137,7 +137,7 @@ resource "kubernetes_deployment_v1" "mysql_atlas" {
     selector {
       match_labels = {
         name      = "mysql-atlas"
-        component = "schema"
+        component = "database"
         part-of   = var.app
       }
     }
@@ -146,7 +146,7 @@ resource "kubernetes_deployment_v1" "mysql_atlas" {
       metadata {
         labels = {
           name      = "mysql-atlas"
-          component = "schema"
+          component = "database"
           part-of   = var.app
         }
       }
@@ -198,7 +198,7 @@ resource "kubernetes_service_v1" "mysql_atlas" {
 
     labels = {
       name      = "mysql-atlas"
-      component = "schema"
+      component = "database"
       part-of   = var.app
     }
   }
@@ -206,7 +206,7 @@ resource "kubernetes_service_v1" "mysql_atlas" {
   spec {
     selector = {
       name      = "mysql-atlas"
-      component = "schema"
+      component = "database"
       part-of   = var.app
     }
 
@@ -225,7 +225,7 @@ resource "kubernetes_deployment_v1" "snipperbox" {
 
     labels = {
       name      = var.app
-      component = "web"
+      component = "server"
       part-of   = var.app
     }
   }
@@ -236,7 +236,7 @@ resource "kubernetes_deployment_v1" "snipperbox" {
     selector {
       match_labels = {
         name      = var.app
-        component = "web"
+        component = "server"
         part-of   = var.app
       }
     }
@@ -245,7 +245,7 @@ resource "kubernetes_deployment_v1" "snipperbox" {
       metadata {
         labels = {
           name      = var.app
-          component = "web"
+          component = "server"
           part-of   = var.app
         }
       }
@@ -293,7 +293,7 @@ resource "kubernetes_service_v1" "snipperbox" {
 
     labels = {
       name      = var.app
-      component = "web"
+      component = "server"
       part-of   = var.app
     }
   }
@@ -301,7 +301,7 @@ resource "kubernetes_service_v1" "snipperbox" {
   spec {
     selector = {
       name      = var.app
-      component = "web"
+      component = "server"
       part-of   = var.app
     }
 
@@ -319,7 +319,8 @@ resource "kubernetes_ingress_v1" "default" {
     namespace = kubernetes_namespace_v1.default.metadata[0].name
 
     labels = {
-      app = var.app
+      name    = var.app
+      part-of = var.app
     }
 
     annotations = {
