@@ -91,7 +91,7 @@ resource "azurerm_mysql_flexible_server" "default" {
 }
 
 resource "atlas_schema" "mysql" {
-  url = "mysql://mysqladmin:${random_password.mysqladmin.result}@${azurerm_mysql_flexible_server.default.fqdn}:3306"
+  url = "mysql://mysqladmin:${random_password.mysqladmin.result}@${azurerm_mysql_flexible_server.default.fqdn}:3306?tls=preferred"
   hcl = data.atlas_schema.sql.hcl
 }
 
