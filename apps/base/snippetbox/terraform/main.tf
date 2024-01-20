@@ -62,6 +62,17 @@ locals {
 
   # Construct the name suffix.
   suffix = "${var.app}-${local.environment_abbreviation}-${local.location_abbreviation}"
+
+  # Construct the data source name,
+  dsn = join("", [
+    random_pet.mysql_login.id,
+    ":",
+    urlencode(random_password.mysql_password.result),
+    "@",
+    "tcp(${azurerm_mysql_flexible_server.default.fqdn})",
+    "/snippetbox",
+    "?parseTime=true&tls=preferred&multiStatements=true",
+  ])
 }
 
 resource "random_pet" "mysql_login" {
@@ -294,18 +305,7 @@ resource "kubernetes_deployment_v1" "snipperbox" {
             protocol       = "TCP"
           }
 
-          env {
-            name  = "DSN"
-            value = join("", [
-              random_pet.mysql_login.id,
-              ":",
-              urlencode(random_password.mysql_password.result),
-              "@",
-              "tcp(${azurerm_mysql_flexible_server.default.fqdn})",
-              "/snippetbox",
-              "?parseTime=true&tls=preferred&multiStatements=true",
-            ])
-          }
+          args = ["-dsn", local.dsn]
 
           resources {
             limits = {
