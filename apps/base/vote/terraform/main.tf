@@ -35,7 +35,7 @@ locals {
   suffix = "${var.app}-${local.environment_abbreviation}-${local.location_abbreviation}"
 }
 
-# Generate a random suffix for the CosmosDB account.
+# Generate a random suffix for the Azure Cache for Redis.
 resource "random_id" "redis" {
   byte_length = 3
 }
