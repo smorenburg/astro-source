@@ -128,6 +128,7 @@ resource "kubernetes_deployment_v1" "default" {
           }
 
           env {
+            # TODO: Store the value in a secret.
             name  = "REDIS_PWD"
             value = azurerm_redis_cache.default.primary_access_key
           }

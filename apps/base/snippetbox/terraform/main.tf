@@ -298,13 +298,12 @@ resource "kubernetes_deployment_v1" "snipperbox" {
           image = var.container_image
           name  = var.app
 
-          # TODO: Configure args to use the Azure Database for MySQL flexible server.
-
           port {
             container_port = 4000
             protocol       = "TCP"
           }
 
+          # TODO: Store the arg in a secret (file). Develop the feature in Snippetbox first.
           args = ["-dsn", local.dsn]
 
           resources {
