@@ -211,8 +211,8 @@ resource "kubernetes_service_v1" "mysql_atlas" {
     }
 
     port {
-      port        = 80
-      target_port = 4000
+      port        = 3306
+      target_port = 3306
     }
   }
 }
