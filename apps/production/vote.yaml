@@ -29,7 +29,7 @@ spec:
         - name: ARM_SUBSCRIPTION_ID
           value: ae9db8ac-2682-4a98-ad36-7d13b2bd5a24
         - name: ARM_CLIENT_ID
-          value: e7ca0613-56d1-4e51-bf3a-2757116e17bc
+          value: f62a5ca0-df2d-4bee-981e-ce5d3c2f9ec3
         - name: ARM_USE_OIDC
           value: "true"
         - name: ARM_OIDC_TOKEN_FILE_PATH
