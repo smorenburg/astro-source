@@ -49,7 +49,7 @@ data "atlas_schema" "default" {
     kubernetes_service_v1.mysql_schema.metadata[0].name,
     ".",
     kubernetes_namespace_v1.default.metadata[0].name,
-    ".svc.cluster.local"
+    ".svc.cluster.local:3306"
   ])
 }
 
@@ -127,7 +127,8 @@ resource "atlas_schema" "default" {
     random_pet.mysql.id,
     urlencode(random_password.mysql.result),
     "@",
-    azurerm_mysql_flexible_server.default.fqdn, "?tls=preferred"
+    azurerm_mysql_flexible_server.default.fqdn,
+    ":3306?tls=preferred"
   ])
 
   depends_on = [azurerm_mysql_flexible_server_firewall_rule.allow_all]
