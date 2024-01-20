@@ -294,6 +294,19 @@ resource "kubernetes_deployment_v1" "snipperbox" {
             protocol       = "TCP"
           }
 
+          env {
+            name  = "DSN"
+            value = join("", [
+              random_pet.mysql_login.id,
+              ":",
+              urlencode(random_password.mysql_password.result),
+              "@",
+              "tcp(${azurerm_mysql_flexible_server.default.fqdn})",
+              "/snippetbox",
+              "?parseTime=true&tls=preferred&multiStatements=true",
+            ])
+          }
+
           resources {
             limits = {
               cpu    = "0.5"
