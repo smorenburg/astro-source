@@ -66,7 +66,8 @@ resource "random_id" "mysql" {
 }
 
 resource "random_password" "mysqladmin" {
-  length = 16
+  length  = 16
+  special = false
 }
 
 resource "azurerm_key_vault_secret" "mysqladmin" {
