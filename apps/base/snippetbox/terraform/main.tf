@@ -105,8 +105,8 @@ resource "azurerm_mysql_flexible_server" "default" {
   location               = var.location
   administrator_login    = random_pet.mysql_login.id
   administrator_password = random_password.mysql_password.result
-  sku_name               = "B_Standard_B1s"
-  zone                   = "1"
+  sku_name               = "B_Standard_B1s" # TODO: Add sku_name as a variable.
+  zone                   = "1" # TODO: Add high-availability.
 
   tags = {
     component = "database"

@@ -13,3 +13,5 @@ spec:
   podSelector:
     matchLabels:
       app.kubernetes.io/name: weave-gitops
+
+# TODO: Add additional network policies.
