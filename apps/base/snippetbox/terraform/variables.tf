@@ -38,6 +38,16 @@ variable "environment_abbreviation" {
   }
 }
 
+variable "resource_group" {
+  description = "Required. The name of the resource group of the storage account including the Terraform state."
+  type        = string
+}
+
+variable "storage_account" {
+  description = "Required. The name of the storage account containing the Terraform state."
+  type        = string
+}
+
 variable "container_image" {
   description = "Required. The image for the container."
   type        = string

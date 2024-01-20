@@ -11,6 +11,11 @@ terraform {
     kubernetes = {
       version = ">= 2.24"
     }
+
+    atlas = {
+      source  = "ariga/atlas"
+      version = ">= 0.6"
+    }
   }
 }
 
@@ -22,7 +27,27 @@ provider "azurerm" {
   }
 }
 
+provider "atlas" {
+  dev_url = "docker://mysql/8"
+}
+
 data "azurerm_client_config" "current" {}
+
+# Configure the Terraform remote state backend.
+data "terraform_remote_state" "environment" {
+  backend = "azurerm"
+
+  config = {
+    storage_account_name = var.storage_account
+    resource_group_name  = var.resource_group
+    container_name       = "tfstate"
+    key                  = "${var.environment}.${var.location}.tfstate"
+  }
+}
+
+data "atlas_schema" "sql" {
+  src = file("templates/schema.hcl")
+}
 
 locals {
   # Lookup and set the location abbreviation, defaults to na (not available).
@@ -35,15 +60,39 @@ locals {
   suffix = "${var.app}-${local.environment_abbreviation}-${local.location_abbreviation}"
 }
 
-# Generate a random suffix for the CosmosDB account.
-resource "random_id" "redis" {
+# Generate a random suffix for the Azure MySQL Flexible Server.
+resource "random_id" "mysql" {
   byte_length = 3
+}
+
+resource "random_password" "mysqladmin" {
+  length = 16
+}
+
+resource "azurerm_key_vault_secret" "mysqladmin" {
+  name         = "mysqladmin"
+  value        = random_password.mysqladmin.result
+  key_vault_id = data.terraform_remote_state.environment.outputs.azurerm_key_vault_default_id
 }
 
 # Create the resource group.
 resource "azurerm_resource_group" "default" {
   name     = "rg-${local.suffix}"
   location = var.location
+}
+
+resource "azurerm_mysql_flexible_server" "default" {
+  name                   = "mysql-${var.app}-${local.environment_abbreviation}-${random_id.mysql.hex}"
+  resource_group_name    = azurerm_resource_group.default.name
+  location               = var.location
+  administrator_login    = "mysqladmin"
+  administrator_password = random_password.mysqladmin.result
+  sku_name               = "B_Standard_B1s"
+}
+
+resource "atlas_schema" "mysql" {
+  url = "mysql://mysqladmin:${random_password.mysqladmin.result}@${azurerm_mysql_flexible_server.default.fqdn}:3306"
+  hcl = data.atlas_schema.sql.hcl
 }
 
 # Create the Kubernetes namespace.

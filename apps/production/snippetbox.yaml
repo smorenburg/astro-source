@@ -17,6 +17,10 @@ spec:
   vars:
     - name: environment
       value: production
+    - name: resource_group
+      value: rg-tfstate-astro-neu
+    - name: storage_account
+      value: stastro052015
     - name: container_image
       value: smorenburg/snippetbox:0.0.3
     - name: ingress_rule_host
