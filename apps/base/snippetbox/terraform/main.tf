@@ -49,7 +49,7 @@ data "atlas_schema" "default" {
     kubernetes_service_v1.mysql_schema.metadata[0].name,
     ".",
     kubernetes_namespace_v1.default.metadata[0].name,
-    ".svc.cluster.local:3306"
+    ".svc.cluster.local"
   ])
 }
 
@@ -125,16 +125,15 @@ resource "azurerm_mysql_flexible_server_firewall_rule" "allow_all" {
 resource "atlas_schema" "default" {
   hcl     = data.atlas_schema.default.hcl
   dev_url = data.atlas_schema.default.dev_url
-  url     = "mysql://${random_pet.mysql_login.id}:${urlencode(random_password.mysql_password.result)}@${azurerm_mysql_flexible_server.default.fqdn}:3306?tls=preferred"
-  #  url     = join("", [
-  #    "mysql://",
-  #    random_pet.mysql_login.id,
-  #    ":",
-  #    urlencode(random_password.mysql_password.result),
-  #    "@",
-  #    azurerm_mysql_flexible_server.default.fqdn,
-  #    ":3306?tls=preferred"
-  #  ])
+  url     = join("", [
+    "mysql://",
+    random_pet.mysql_login.id,
+    ":",
+    urlencode(random_password.mysql_password.result),
+    "@",
+    azurerm_mysql_flexible_server.default.fqdn,
+    "?tls=preferred"
+  ])
 
   depends_on = [azurerm_mysql_flexible_server_firewall_rule.allow_all]
 }
