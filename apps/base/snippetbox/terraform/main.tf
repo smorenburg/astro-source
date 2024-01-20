@@ -91,9 +91,19 @@ resource "azurerm_mysql_flexible_server" "default" {
   zone                   = "1"
 }
 
+resource "azurerm_mysql_flexible_server_firewall_rule" "allow_all" {
+  name                = "AllowAll"
+  resource_group_name = azurerm_resource_group.default.name
+  server_name         = azurerm_mysql_flexible_server.default.name
+  start_ip_address    = "0.0.0.0"
+  end_ip_address      = "255.255.255.255"
+}
+
 resource "atlas_schema" "mysql" {
   url = "mysql://mysqladmin:${random_password.mysqladmin.result}@${azurerm_mysql_flexible_server.default.fqdn}:3306?tls=preferred"
   hcl = data.atlas_schema.sql.hcl
+
+  depends_on = [azurerm_mysql_flexible_server_firewall_rule.allow_all]
 }
 
 # Create the Kubernetes namespace.
