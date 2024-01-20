@@ -64,7 +64,9 @@ locals {
   suffix = "${var.app}-${local.environment_abbreviation}-${local.location_abbreviation}"
 }
 
-resource "random_pet" "mysql_login" {}
+resource "random_pet" "mysql_login" {
+  length = 1
+}
 
 resource "random_password" "mysql_password" {
   length = 16
@@ -121,8 +123,9 @@ resource "azurerm_mysql_flexible_server_firewall_rule" "allow_all" {
 }
 
 resource "atlas_schema" "default" {
-  hcl = data.atlas_schema.default.hcl
-  url = join("", [
+  hcl     = data.atlas_schema.default.hcl
+  dev_url = data.atlas_schema.default.dev_url
+  url     = join("", [
     "mysql://",
     random_pet.mysql_login.id,
     ":",
