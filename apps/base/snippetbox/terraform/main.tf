@@ -28,9 +28,7 @@ provider "azurerm" {
 }
 
 # TODO: Add comments.
-provider "atlas" {
-  dev_url = "mysql://root@mysql-schema.snippetbox.svc.cluster.local:3306"
-}
+provider "atlas" {}
 
 data "azurerm_client_config" "current" {}
 
@@ -47,7 +45,10 @@ data "terraform_remote_state" "environment" {
 }
 
 data "atlas_schema" "default" {
-  src = file("templates/schema.hcl")
+  src     = file("templates/schema.hcl")
+  dev_url = "mysql://root@mysql-schema.snippetbox.svc.cluster.local:3306"
+
+  depends_on = [kubernetes_service_v1.mysql_schema]
 }
 
 locals {
