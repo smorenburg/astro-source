@@ -49,7 +49,7 @@ data "atlas_schema" "default" {
     kubernetes_service_v1.mysql_schema.metadata[0].name,
     ".",
     kubernetes_namespace_v1.default.metadata[0].name,
-    ".svc.cluster.local:3306"
+    ".svc.cluster.local"
   ])
 }
 
@@ -64,9 +64,9 @@ locals {
   suffix = "${var.app}-${local.environment_abbreviation}-${local.location_abbreviation}"
 }
 
-resource "random_pet" "mysql" {}
+resource "random_pet" "mysql_login" {}
 
-resource "random_password" "mysql" {
+resource "random_password" "mysql_password" {
   length = 16
 }
 
@@ -77,13 +77,13 @@ resource "random_id" "mysql" {
 
 resource "azurerm_key_vault_secret" "mysql_login" {
   name         = "${var.app}-mysql-login"
-  value        = random_pet.mysql.id
+  value        = random_pet.mysql_login.id
   key_vault_id = data.terraform_remote_state.environment.outputs.azurerm_key_vault_default_id
 }
 
 resource "azurerm_key_vault_secret" "mysql_password" {
   name         = "${var.app}-mysql-password"
-  value        = random_password.mysql.result
+  value        = random_password.mysql_password.result
   key_vault_id = data.terraform_remote_state.environment.outputs.azurerm_key_vault_default_id
 }
 
@@ -101,8 +101,8 @@ resource "azurerm_mysql_flexible_server" "default" {
   name                   = "mysql-${var.app}-${local.environment_abbreviation}-${random_id.mysql.hex}"
   resource_group_name    = azurerm_resource_group.default.name
   location               = var.location
-  administrator_login    = random_pet.mysql.id
-  administrator_password = random_password.mysql.result
+  administrator_login    = random_pet.mysql_login.id
+  administrator_password = random_password.mysql_password.result
   sku_name               = "B_Standard_B1s"
   zone                   = "1"
 
@@ -123,12 +123,13 @@ resource "azurerm_mysql_flexible_server_firewall_rule" "allow_all" {
 resource "atlas_schema" "default" {
   hcl = data.atlas_schema.default.hcl
   url = join("", [
-    "mysql://:",
-    random_pet.mysql.id,
-    urlencode(random_password.mysql.result),
+    "mysql://",
+    random_pet.mysql_login.id,
+    ":",
+    urlencode(random_password.mysql_password.result),
     "@",
     azurerm_mysql_flexible_server.default.fqdn,
-    ":3306?tls=preferred"
+    "?tls=preferred"
   ])
 
   depends_on = [azurerm_mysql_flexible_server_firewall_rule.allow_all]
