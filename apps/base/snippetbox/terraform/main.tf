@@ -161,6 +161,11 @@ resource "kubernetes_deployment_v1" "mysql_atlas" {
             protocol       = "TCP"
           }
 
+          env {
+            name  = "MYSQL_ALLOW_EMPTY_PASSWORD"
+            value = true
+          }
+
           resources {
             limits = {
               cpu    = "0.5"
@@ -253,11 +258,6 @@ resource "kubernetes_deployment_v1" "snipperbox" {
           port {
             container_port = 4000
             protocol       = "TCP"
-          }
-
-          env {
-            name  = "MYSQL_ALLOW_EMPTY_PASSWORD"
-            value = true
           }
 
           resources {
