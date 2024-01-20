@@ -66,8 +66,7 @@ resource "random_id" "mysql" {
 }
 
 resource "random_password" "mysqladmin" {
-  length  = 16
-  special = false
+  length = 16
 }
 
 resource "azurerm_key_vault_secret" "mysqladmin" {
@@ -101,7 +100,7 @@ resource "azurerm_mysql_flexible_server_firewall_rule" "allow_all" {
 }
 
 resource "atlas_schema" "mysql" {
-  url = "mysql://mysqladmin:${random_password.mysqladmin.result}@${azurerm_mysql_flexible_server.default.fqdn}:3306?tls=preferred"
+  url = "mysql://mysqladmin:${urlencode(random_password.mysqladmin.result)}@${azurerm_mysql_flexible_server.default.fqdn}:3306?tls=preferred"
   hcl = data.atlas_schema.sql.hcl
 
   depends_on = [azurerm_mysql_flexible_server_firewall_rule.allow_all]
