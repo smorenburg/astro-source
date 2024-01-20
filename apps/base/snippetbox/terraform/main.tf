@@ -45,7 +45,7 @@ data "terraform_remote_state" "environment" {
   }
 }
 
-data "atlas_schema" "sql" {
+data "atlas_schema" "default" {
   src = file("templates/schema.hcl")
 }
 
@@ -99,9 +99,9 @@ resource "azurerm_mysql_flexible_server_firewall_rule" "allow_all" {
   end_ip_address      = "255.255.255.255"
 }
 
-resource "atlas_schema" "mysql" {
+resource "atlas_schema" "default" {
   url = "mysql://mysqladmin:${urlencode(random_password.mysqladmin.result)}@${azurerm_mysql_flexible_server.default.fqdn}:3306?tls=preferred"
-  hcl = data.atlas_schema.sql.hcl
+  hcl = data.atlas_schema.default.hcl
 
   depends_on = [azurerm_mysql_flexible_server_firewall_rule.allow_all]
 }
@@ -117,14 +117,15 @@ resource "kubernetes_namespace_v1" "default" {
   }
 }
 
-# Create the Kubernetes deployment.
-resource "kubernetes_deployment_v1" "default" {
+# Create the mysql-atlas Kubernetes deployment.
+resource "kubernetes_deployment_v1" "mysql_atlas" {
   metadata {
-    name      = var.app
+    name      = "mysql-atlas"
     namespace = kubernetes_namespace_v1.default.metadata[0].name
 
     labels = {
-      app = var.app
+      app       = var.app
+      component = "schema"
     }
   }
 
@@ -133,14 +134,105 @@ resource "kubernetes_deployment_v1" "default" {
 
     selector {
       match_labels = {
-        app = var.app
+        app       = var.app
+        component = "schema"
       }
     }
 
     template {
       metadata {
         labels = {
-          app = var.app
+          app       = var.app
+          component = "schema"
+        }
+      }
+
+      spec {
+        container {
+          image = "mysql:8"
+          name  = "mysql-atlas"
+
+          port {
+            container_port = 3306
+            protocol       = "TCP"
+          }
+
+          resources {
+            limits = {
+              cpu    = "0.5"
+              memory = "512Mi"
+            }
+            requests = {
+              cpu    = "250m"
+              memory = "50Mi"
+            }
+          }
+
+          liveness_probe {
+            tcp_socket {
+              port = "3306"
+            }
+
+            initial_delay_seconds = 15
+          }
+        }
+      }
+    }
+  }
+}
+
+# Create the mysql-atlas Kubernetes service.
+resource "kubernetes_service_v1" "mysql_atlas" {
+  metadata {
+    name      = "mysql-atlas"
+    namespace = kubernetes_namespace_v1.default.metadata[0].name
+
+    labels = {
+      app       = var.app
+      component = "schema"
+    }
+  }
+
+  spec {
+    selector = {
+      app       = var.app
+      component = "schema"
+    }
+
+    port {
+      port        = 80
+      target_port = 4000
+    }
+  }
+}
+
+# Create the snipperbox Kubernetes deployment.
+resource "kubernetes_deployment_v1" "snipperbox" {
+  metadata {
+    name      = var.app
+    namespace = kubernetes_namespace_v1.default.metadata[0].name
+
+    labels = {
+      app       = var.app
+      component = "web"
+    }
+  }
+
+  spec {
+    replicas = 1
+
+    selector {
+      match_labels = {
+        app       = var.app
+        component = "web"
+      }
+    }
+
+    template {
+      metadata {
+        labels = {
+          app       = var.app
+          component = "web"
         }
       }
 
@@ -179,20 +271,22 @@ resource "kubernetes_deployment_v1" "default" {
   }
 }
 
-# Create the Kubernetes service.
-resource "kubernetes_service_v1" "default" {
+# Create the snipperbox Kubernetes service.
+resource "kubernetes_service_v1" "snipperbox" {
   metadata {
     name      = var.app
     namespace = kubernetes_namespace_v1.default.metadata[0].name
 
     labels = {
-      app = var.app
+      app       = var.app
+      component = "web"
     }
   }
 
   spec {
     selector = {
-      app = var.app
+      app       = var.app
+      component = "web"
     }
 
     port {
