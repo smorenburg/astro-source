@@ -28,7 +28,7 @@ provider "azurerm" {
 }
 
 provider "atlas" {
-  dev_url = "mysql://root@mysql-atlas:3306"
+  dev_url = "mysql://root@mysql-atlas.snipperbox.svc.cluster.local:3306"
 }
 
 data "azurerm_client_config" "current" {}
