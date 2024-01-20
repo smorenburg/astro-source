@@ -140,7 +140,7 @@ resource "atlas_schema" "default" {
     "mysql://",
     random_pet.mysql_login.id,
     ":",
-    urlencode(random_password.mysql_password.result),
+    random_password.mysql_password.result,
     "@",
     azurerm_mysql_flexible_server.default.fqdn,
     "?tls=preferred"
