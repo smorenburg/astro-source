@@ -27,9 +27,6 @@ provider "azurerm" {
   }
 }
 
-# TODO: Add comments.
-provider "atlas" {}
-
 data "azurerm_client_config" "current" {}
 
 # Configure the Terraform remote state backend.
@@ -44,6 +41,7 @@ data "terraform_remote_state" "environment" {
   }
 }
 
+# TODO: Add comments.
 data "atlas_schema" "default" {
   src     = file("templates/schema.hcl")
   dev_url = "mysql://root@mysql-schema.snippetbox.svc.cluster.local:3306"
@@ -129,7 +127,7 @@ resource "kubernetes_namespace_v1" "default" {
   }
 }
 
-# Create the mysql-atlas Kubernetes deployment.
+# Create the mysql-schema Kubernetes deployment.
 resource "kubernetes_deployment_v1" "mysql_schema" {
   metadata {
     name      = "mysql-schema"
@@ -180,11 +178,11 @@ resource "kubernetes_deployment_v1" "mysql_schema" {
           resources {
             limits = {
               cpu    = "0.5"
-              memory = "512Mi"
+              memory = "1Gi"
             }
             requests = {
               cpu    = "250m"
-              memory = "50Mi"
+              memory = "512Mi"
             }
           }
 
@@ -201,7 +199,7 @@ resource "kubernetes_deployment_v1" "mysql_schema" {
   }
 }
 
-# Create the mysql-atlas Kubernetes service.
+# Create the mysql-schema Kubernetes service.
 resource "kubernetes_service_v1" "mysql_schema" {
   metadata {
     name      = "mysql-schema"
