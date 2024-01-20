@@ -112,7 +112,8 @@ resource "kubernetes_namespace_v1" "default" {
     name = var.app
 
     labels = {
-      app = var.app
+      name    = var.app
+      part-of = var.app
     }
   }
 }
@@ -124,8 +125,9 @@ resource "kubernetes_deployment_v1" "mysql_atlas" {
     namespace = kubernetes_namespace_v1.default.metadata[0].name
 
     labels = {
-      app       = var.app
+      name      = "mysql-atlas"
       component = "schema"
+      part-of   = var.app
     }
   }
 
@@ -134,16 +136,18 @@ resource "kubernetes_deployment_v1" "mysql_atlas" {
 
     selector {
       match_labels = {
-        app       = var.app
+        name      = "mysql-atlas"
         component = "schema"
+        part-of   = var.app
       }
     }
 
     template {
       metadata {
         labels = {
-          app       = var.app
+          name      = "mysql-atlas"
           component = "schema"
+          part-of   = var.app
         }
       }
 
@@ -188,15 +192,17 @@ resource "kubernetes_service_v1" "mysql_atlas" {
     namespace = kubernetes_namespace_v1.default.metadata[0].name
 
     labels = {
-      app       = var.app
+      name      = "mysql-atlas"
       component = "schema"
+      part-of   = var.app
     }
   }
 
   spec {
     selector = {
-      app       = var.app
+      name      = "mysql-atlas"
       component = "schema"
+      part-of   = var.app
     }
 
     port {
@@ -213,8 +219,9 @@ resource "kubernetes_deployment_v1" "snipperbox" {
     namespace = kubernetes_namespace_v1.default.metadata[0].name
 
     labels = {
-      app       = var.app
+      name      = var.app
       component = "web"
+      part-of   = var.app
     }
   }
 
@@ -223,16 +230,18 @@ resource "kubernetes_deployment_v1" "snipperbox" {
 
     selector {
       match_labels = {
-        app       = var.app
+        name      = var.app
         component = "web"
+        part-of   = var.app
       }
     }
 
     template {
       metadata {
         labels = {
-          app       = var.app
+          name      = var.app
           component = "web"
+          part-of   = var.app
         }
       }
 
@@ -244,6 +253,11 @@ resource "kubernetes_deployment_v1" "snipperbox" {
           port {
             container_port = 4000
             protocol       = "TCP"
+          }
+
+          env {
+            name  = "MYSQL_ALLOW_EMPTY_PASSWORD"
+            value = true
           }
 
           resources {
@@ -278,15 +292,17 @@ resource "kubernetes_service_v1" "snipperbox" {
     namespace = kubernetes_namespace_v1.default.metadata[0].name
 
     labels = {
-      app       = var.app
+      name      = var.app
       component = "web"
+      part-of   = var.app
     }
   }
 
   spec {
     selector = {
-      app       = var.app
+      name      = var.app
       component = "web"
+      part-of   = var.app
     }
 
     port {
