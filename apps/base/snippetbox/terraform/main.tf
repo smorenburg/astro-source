@@ -60,7 +60,7 @@ locals {
   suffix = "${var.app}-${local.environment_abbreviation}-${local.location_abbreviation}"
 }
 
-# Generate a random suffix for the Azure MySQL Flexible Server.
+# Generate a random suffix for the Azure Database for MySQL flexible server.
 resource "random_id" "mysql" {
   byte_length = 3
 }
@@ -254,6 +254,8 @@ resource "kubernetes_deployment_v1" "snipperbox" {
         container {
           image = var.container_image
           name  = var.app
+
+          # TODO: Configure args to use the Azure Database for MySQL flexible server.
 
           port {
             container_port = 4000
