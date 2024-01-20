@@ -22,7 +22,7 @@ spec:
     - name: storage_account
       value: stastro052015
     - name: container_image
-      value: smorenburg/snippetbox:0.0.3
+      value: smorenburg/snippetbox:0.0.4
     - name: ingress_rule_host
       value: snippetbox.52.169.234.0.nip.io
   runnerPodTemplate:
