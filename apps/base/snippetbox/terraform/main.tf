@@ -70,7 +70,7 @@ resource "random_password" "mysqladmin" {
 }
 
 resource "azurerm_key_vault_secret" "mysqladmin" {
-  name         = "mysqladmin"
+  name         = "${var.app}-mysqladmin"
   value        = random_password.mysqladmin.result
   key_vault_id = data.terraform_remote_state.environment.outputs.azurerm_key_vault_default_id
 }
@@ -88,6 +88,7 @@ resource "azurerm_mysql_flexible_server" "default" {
   administrator_login    = "mysqladmin"
   administrator_password = random_password.mysqladmin.result
   sku_name               = "B_Standard_B1s"
+  zone                   = "1"
 }
 
 resource "atlas_schema" "mysql" {
