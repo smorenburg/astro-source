@@ -5,4 +5,5 @@ metadata:
   name: letsencrypt
 spec:
   acme:
+    # Staging certificates are untrusted: https://letsencrypt.org/docs/staging-environment/.
     server: https://acme-staging-v02.api.letsencrypt.org/directory
