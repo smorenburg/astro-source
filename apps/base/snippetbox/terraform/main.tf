@@ -14,7 +14,7 @@ terraform {
 
     atlas = {
       source  = "ariga/atlas"
-      version = ">= 0.6"
+      version = "0.6.1"
     }
   }
 }
