@@ -9,6 +9,7 @@ spec:
   interval: 1m
   tfstate:
     forceUnlock: auto
+  # TODO: Disable auto approve for production.
   approvePlan: auto
   destroyResourcesOnDeletion: true
   sourceRef:
