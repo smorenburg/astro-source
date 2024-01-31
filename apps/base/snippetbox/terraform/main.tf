@@ -12,9 +12,10 @@ terraform {
       version = ">= 2.24"
     }
 
+    # TODO: Start using version 0.8 by adding the atlas-cli to the tf-runner container image.
     atlas = {
       source  = "ariga/atlas"
-      version = "0.6.1"
+      version = "0.7"
     }
   }
 }
