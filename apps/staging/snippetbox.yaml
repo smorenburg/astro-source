@@ -17,6 +17,10 @@ spec:
   vars:
     - name: environment
       value: staging
+    - name: resource_group
+      value: rg-tfstate-astro-neu
+    - name: storage_account
+      value: stastro052015
     - name: container_image
       value: smorenburg/snippetbox:0.0.2
     - name: ingress_rule_host
@@ -29,7 +33,7 @@ spec:
         - name: ARM_SUBSCRIPTION_ID
           value: ae9db8ac-2682-4a98-ad36-7d13b2bd5a24
         - name: ARM_CLIENT_ID
-          value: 87c5379e-fd4e-4cda-997c-3a9ce66b87fb
+          value: 33bcec27-23d2-42cc-96df-24863ae965f4
         - name: ARM_USE_OIDC
           value: "true"
         - name: ARM_OIDC_TOKEN_FILE_PATH
