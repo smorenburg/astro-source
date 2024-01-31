@@ -27,6 +27,8 @@ provider "azurerm" {
   }
 }
 
+provider "atlas" {}
+
 data "azurerm_client_config" "current" {}
 
 # Configure the Terraform remote state backend.
