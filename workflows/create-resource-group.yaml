@@ -1,0 +1,21 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: create-resource-group
+  namespace: argo
+spec:
+  entrypoint: create-resource-group
+  serviceAccountName: argo-workflow
+  templates:
+    - name: create-resource-group
+      metadata:
+        labels:
+          azure.workload.identity/use: "true"
+      container:
+        image: smorenburg/pwsh
+        command: [ "pwsh" ]
+        args: [
+          "-command",
+          "./Create-ResourceGroup.ps1"
+        ]
