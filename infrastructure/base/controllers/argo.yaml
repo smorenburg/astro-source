@@ -30,6 +30,8 @@ spec:
         namespace: argo
       interval: 12h
   values:
+    server:
+      authModes: [ server ]
     workflow:
       serviceAccount:
         create: true
