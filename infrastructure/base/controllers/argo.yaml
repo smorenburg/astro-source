@@ -36,5 +36,7 @@ spec:
       serviceAccount:
         create: true
         name: argo-workflow
+        annotations:
+          azure.workload.identity/client-id: 3ec2254a-28ef-4044-8e41-e5f199c8448a
       rbac:
         create: true
