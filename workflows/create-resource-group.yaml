@@ -13,9 +13,9 @@ spec:
         labels:
           azure.workload.identity/use: "true"
       container:
-        image: smorenburg/pwsh
+        image: smorenburg/powershell
         command: [ "pwsh" ]
         args: [
-          "-command",
+          "-Command",
           "./Create-ResourceGroup.ps1"
         ]
