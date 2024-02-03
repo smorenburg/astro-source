@@ -7,8 +7,21 @@ metadata:
 spec:
   entrypoint: create-resource-group
   serviceAccountName: argo-workflow
+  arguments:
+    parameters:
+      - name: subscription-id
+        value: ae9db8ac-2682-4a98-ad36-7d13b2bd5a24
+      - name: location
+        value: northeurope
+      - name: resource-group-suffix
+        value: rg-
   templates:
     - name: create-resource-group
+      inputs:
+        parameters:
+          - name: subscription-id
+          - name: location
+          - name: resource-group-suffix
       metadata:
         labels:
           azure.workload.identity/use: "true"
@@ -17,5 +30,8 @@ spec:
         command: [ "pwsh" ]
         args: [
           "-Command",
-          "./Create-ResourceGroup.ps1"
+          "./Create-ResourceGroup.ps1",
+          "-SubscriptionId {{inputs.parameters.subscription-id}}",
+          "-Location {{inputs.parameters.location}}",
+          "-ResourceGroupSuffix {{inputs.parameters.resource-group-suffix}}"
         ]
