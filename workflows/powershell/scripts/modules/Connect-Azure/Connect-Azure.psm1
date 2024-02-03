@@ -4,7 +4,9 @@ Function Connect-Azure
         [string]$SubscriptionId
     )
 
-    $federatedToken = Get-Content -Path $Env:AZURE_FEDERATED_TOKEN_FILE -Raw
+    $federatedToken = Get-Content `
+        -Path $Env:AZURE_FEDERATED_TOKEN_FILE `
+        -Raw
 
     Import-Module -Name Az.Accounts
 
@@ -14,7 +16,7 @@ Function Connect-Azure
         -SubscriptionId $SubscriptionId `
         -FederatedToken $federatedToken `
         -WarningAction:SilentlyContinue |
-        Out-Null
+            Out-Null
 }
 
 Export-ModuleMember -Function Connect-Azure
