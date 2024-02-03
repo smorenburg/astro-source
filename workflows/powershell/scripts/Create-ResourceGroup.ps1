@@ -10,7 +10,7 @@ $resourceGroupName = $ResourceGroupSuffix + $random
 
 If ($ConnectAzure)
 {
-    Import-Module $PSScriptRoot/modules/Connect-Azure.psm1
+    Import-Module $PSScriptRoot/modules/Connect-Azure/Connect-Azure.psm1
     Connect-Azure -SubscriptionId $SubscriptionId
 }
 
