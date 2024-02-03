@@ -7,11 +7,12 @@ Param(
 $random = -Join ("0123456789abcdef".tochararray() | Get-Random -Count 6 | ForEach-Object -Parallel { [char]$_ })
 $resourceGroupName = $ResourceGroupSuffix + $random
 
-Import-Module $PSScriptRoot/modules/Connect-Azure/Connect-Azure.psm1
+Import-Module -Name $PSScriptRoot/modules/Connect-Azure/Connect-Azure.psm1
 
 Connect-Azure -SubscriptionId $SubscriptionId
 
-Import-Module Az.Resources
+Import-Module -Name Az.Resources
 
-New-AzResourceGroup -Name $resourceGroupName `
+New-AzResourceGroup `
+    -Name $resourceGroupName `
     -Location $Location
