@@ -1,20 +1,34 @@
-Param(
+param(
     [string]$SubscriptionId,
     [string]$Location,
     [string]$ResourceGroupSuffix
 )
 
-$random = -Join ("0123456789abcdef".tochararray() |
-        Get-Random -Count 6 |
-        ForEach-Object -Parallel { [char]$_ })
-$resourceGroupName = $ResourceGroupSuffix + $random
+$ErrorActionPreference = "Stop"
 
-Import-Module -Name $PSScriptRoot/modules/Connect-Azure/Connect-Azure.psm1
-
-Connect-Azure -SubscriptionId $SubscriptionId
-
+Import-Module -Name $PSScriptRoot/modules/Tools/Tools.psm1
 Import-Module -Name Az.Resources
 
-New-AzResourceGroup `
-    -Name $resourceGroupName `
-    -Location $Location
+$random = New-RandomString -Characters 6 -Lowercase -Numbers
+$resourceGroupName = $ResourceGroupSuffix + $random
+
+try
+{
+    Connect-Azure -SubscriptionId $SubscriptionId
+}
+catch
+{
+    Write-Output -InputObject $PSItem
+    exit 1
+}
+
+# TODO: Check for existing resource group.
+try
+{
+    New-AzResourceGroup -Name $resourceGroupName -Location $Location
+}
+catch
+{
+    Write-Output -InputObject $PSItem
+    exit 1
+}
