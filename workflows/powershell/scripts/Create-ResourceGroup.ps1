@@ -9,9 +9,6 @@ $ErrorActionPreference = "Stop"
 Import-Module -Name $PSScriptRoot/modules/Tools/Tools.psm1
 Import-Module -Name Az.Resources
 
-$random = New-RandomString -Characters 6 -Lowercase -Numbers
-$resourceGroupName = $ResourceGroupSuffix + $random
-
 try
 {
     Connect-Azure -SubscriptionId $SubscriptionId
@@ -21,6 +18,9 @@ catch
     Write-Output -InputObject $PSItem
     exit 1
 }
+
+$randomString = New-RandomString -Characters 6 -Lowercase -Numbers
+$resourceGroupName = $ResourceGroupSuffix + $randomString
 
 # TODO: Check for existing resource group.
 try

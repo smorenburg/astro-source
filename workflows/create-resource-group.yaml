@@ -14,7 +14,7 @@ spec:
       - name: location
         value: northeurope
       - name: resource-group-suffix
-        value: rg-
+        value: rg-argo-
   templates:
     - name: create-resource-group
       inputs:
