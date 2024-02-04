@@ -25,6 +25,8 @@ spec:
       metadata:
         labels:
           azure.workload.identity/use: "true"
+      continueOn:
+        failed: false
       container:
         image: smorenburg/powershell
         command: [ "pwsh" ]
