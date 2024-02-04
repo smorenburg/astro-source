@@ -1,7 +1,7 @@
-FROM mcr.microsoft.com/azure-powershell:ubuntu-22.04
+FROM mcr.microsoft.com/azure-powershell:alpine-3.17
 
 COPY /scripts /scripts
 
 WORKDIR /scripts
 
-CMD [ "pwsh" ]
+CMD [ "pwsh", "-Command", "$PSVersionTable" ]
