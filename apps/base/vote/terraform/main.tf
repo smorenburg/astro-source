@@ -36,8 +36,10 @@ locals {
 }
 
 # Generate a random suffix for the Azure Cache for Redis.
-resource "random_id" "redis" {
-  byte_length = 3
+resource "random_string" "redis" {
+  length  = 6
+  special = false
+  upper   = false
 }
 
 # Create the resource group.
@@ -52,7 +54,7 @@ resource "azurerm_resource_group" "default" {
 
 # Create the Azure Cache for Redis.
 resource "azurerm_redis_cache" "default" {
-  name                = "redis-${var.app}-${local.environment_abbreviation}-${random_id.redis.hex}"
+  name                = "redis-${var.app}-${local.environment_abbreviation}-${random_string.redis.result}"
   location            = var.location
   resource_group_name = azurerm_resource_group.default.name
   capacity            = 0

@@ -87,8 +87,10 @@ resource "random_password" "mysql_password" {
 }
 
 # Generate a random suffix for the Azure Database for MySQL flexible server.
-resource "random_id" "mysql" {
-  byte_length = 3
+resource "random_string" "mysql" {
+  length  = 6
+  special = false
+  upper   = false
 }
 
 resource "azurerm_key_vault_secret" "mysql_login" {
@@ -114,7 +116,7 @@ resource "azurerm_resource_group" "default" {
 }
 
 resource "azurerm_mysql_flexible_server" "default" {
-  name                   = "mysql-${var.app}-${local.environment_abbreviation}-${random_id.mysql.hex}"
+  name                   = "mysql-${var.app}-${local.environment_abbreviation}-${random_string.mysql.result}"
   resource_group_name    = azurerm_resource_group.default.name
   location               = var.location
   administrator_login    = random_pet.mysql_login.id
