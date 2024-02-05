@@ -9,7 +9,7 @@ spec:
     customConfiguration: |
       backend "azurerm" {
         resource_group_name  = "rg-tfstate-astro-neu"
-        storage_account_name = "stastroe29bda"
+        storage_account_name = "stastrop0ze8b"
         container_name       = "tfstate"
         key                  = "snippetbox.staging.northeurope.tfstate"
         use_oidc             = true
@@ -20,7 +20,7 @@ spec:
     - name: resource_group
       value: rg-tfstate-astro-neu
     - name: storage_account
-      value: stastroe29bda
+      value: stastrop0ze8b
     - name: container_image
       value: smorenburg/snippetbox:0.0.6
     - name: ingress_rule_host
@@ -33,7 +33,7 @@ spec:
         - name: ARM_SUBSCRIPTION_ID
           value: ae9db8ac-2682-4a98-ad36-7d13b2bd5a24
         - name: ARM_CLIENT_ID
-          value: 0ac4fd86-d57c-4c73-9d23-156740793ed7
+          value: b7f80df6-2d53-433f-a041-c4bdfc3e84ca
         - name: ARM_USE_OIDC
           value: "true"
         - name: ARM_OIDC_TOKEN_FILE_PATH
