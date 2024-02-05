@@ -1,3 +1,5 @@
+$ErrorActionPreference = "Stop"
+
 function Connect-Azure
 {
     # TODO: Add more connection methods besides workload identity.
