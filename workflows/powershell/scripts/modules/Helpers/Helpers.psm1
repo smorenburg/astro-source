@@ -45,8 +45,8 @@ function New-RandomString
         [int]$Characters,
         [switch]$Lowercase,
         [switch]$Uppercase,
-        [switch]$Numbers,
-        [switch]$Symbols
+        [switch]$Numeric,
+        [switch]$Special
     )
 
     $input = $empty
@@ -59,11 +59,11 @@ function New-RandomString
     {
         $input += "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     }
-    if ($Numbers)
+    if ($Numeric)
     {
         $input += "0123456789"
     }
-    if ($Symbols)
+    if ($Special)
     {
         $input += "~`! @#$%^&*()_-+={[}]|\:;`"'<,>.?/"
     }

@@ -11,7 +11,7 @@ Import-Module -Name Az.Resources
 
 Connect-Azure -SubscriptionId $SubscriptionId
 
-$randomString = New-RandomString -Characters 6 -Lowercase -Numbers
+$randomString = New-RandomString -Characters 6 -Lowercase -Numeric
 $resourceGroupName = $ResourceGroupSuffix + $randomString
 
 # TODO: Check for existing resource group.
