@@ -6,18 +6,10 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-Import-Module -Name $PSScriptRoot/modules/Tools/Tools.psm1
+Import-Module -Name $PSScriptRoot/modules/Helpers/Helpers.psm1
 Import-Module -Name Az.Resources
 
-try
-{
-    Connect-Azure -SubscriptionId $SubscriptionId
-}
-catch
-{
-    Write-Output -InputObject $PSItem
-    exit 1
-}
+Connect-Azure -SubscriptionId $SubscriptionId
 
 $randomString = New-RandomString -Characters 6 -Lowercase -Numbers
 $resourceGroupName = $ResourceGroupSuffix + $randomString
