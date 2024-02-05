@@ -20,7 +20,7 @@ spec:
     - name: resource_group
       value: rg-tfstate-astro-neu
     - name: storage_account
-      value: stastro052015
+      value: stastroe29bda
     - name: container_image
       value: smorenburg/snippetbox:0.0.6
     - name: ingress_rule_host
