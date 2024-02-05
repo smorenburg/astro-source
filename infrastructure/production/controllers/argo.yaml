@@ -1,0 +1,14 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: argo-workflows
+  namespace: argo
+spec:
+  values:
+    server:
+      authModes: [ server ]
+    workflow:
+      serviceAccount:
+        annotations:
+          azure.workload.identity/client-id: 3ec2254a-28ef-4044-8e41-e5f199c8448a

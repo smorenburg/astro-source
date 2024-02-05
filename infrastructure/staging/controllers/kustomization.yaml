@@ -11,3 +11,7 @@ patches:
     target:
       kind: HelmRelease
       name: ingress-nginx
+  - path: argo.yaml
+    target:
+      kind: HelmRelease
+      name: argo-workflows
