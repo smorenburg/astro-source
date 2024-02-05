@@ -9,7 +9,7 @@ spec:
     customConfiguration: |
       backend "azurerm" {
         resource_group_name  = "rg-tfstate-astro-neu"
-        storage_account_name = "stastro052015"
+        storage_account_name = "stastroe29bda"
         container_name       = "tfstate"
         key                  = "vote.staging.northeurope.tfstate"
         use_oidc             = true
@@ -20,7 +20,7 @@ spec:
     - name: container_image
       value: mcr.microsoft.com/azuredocs/azure-vote-front:v1
     - name: ingress_rule_host
-      value: vote.52.169.239.232.nip.io
+      value: vote.4.210.87.22.nip.io
   runnerPodTemplate:
     spec:
       env:
@@ -29,7 +29,7 @@ spec:
         - name: ARM_SUBSCRIPTION_ID
           value: ae9db8ac-2682-4a98-ad36-7d13b2bd5a24
         - name: ARM_CLIENT_ID
-          value: 33bcec27-23d2-42cc-96df-24863ae965f4
+          value: 0ac4fd86-d57c-4c73-9d23-156740793ed7
         - name: ARM_USE_OIDC
           value: "true"
         - name: ARM_OIDC_TOKEN_FILE_PATH
