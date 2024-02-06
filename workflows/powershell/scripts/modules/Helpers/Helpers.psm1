@@ -1,12 +1,12 @@
 $ErrorActionPreference = "Stop"
 
+Import-Module -Name Az.Accounts
+
 function Connect-Azure
 {
     param(
         [string]$SubscriptionId
     )
-
-    Import-Module -Name Az.Accounts
 
     # TODO: Add more connection methods besides workload identity.
     $federatedToken = Get-Content -Path $Env:AZURE_FEDERATED_TOKEN_FILE -Raw
@@ -25,6 +25,7 @@ Export-ModuleMember -Function Connect-Azure
 
 function New-RandomString
 {
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [int]$Characters,
         [switch]$Lowercase,
@@ -33,28 +34,28 @@ function New-RandomString
         [switch]$Special
     )
 
-    $input = $empty
+    $string = $empty
 
     if ($Lowercase)
     {
-        $input += "abcdefghijklmnopqrstuwvxyz"
+        $string += "abcdefghijklmnopqrstuwvxyz"
     }
     if ($Uppercase)
     {
-        $input += "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        $string += "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     }
     if ($Numeric)
     {
-        $input += "0123456789"
+        $string += "0123456789"
     }
     if ($Special)
     {
-        $input += "~`! @#$%^&*()_-+={[}]|\:;`"'<,>.?/"
+        $string += "~`! @#$%^&*()_-+={[}]|\:;`"'<,>.?/"
     }
 
-    $string = -Join ($input.tochararray() | Get-Random -Count $Characters | ForEach-Object { [char]$PSItem })
+    $randomString = -Join ($string.ToCharArray() | Get-Random -Count $Characters | ForEach-Object { [char]$PSItem })
 
-    return $string
+    return $randomString
 }
 
 Export-ModuleMember -Function New-RandomString

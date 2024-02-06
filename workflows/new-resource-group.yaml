@@ -2,10 +2,10 @@
 apiVersion: argoproj.io/v1alpha1
 kind: WorkflowTemplate
 metadata:
-  name: create-resource-group
+  name: new-resource-group
   namespace: argo
 spec:
-  entrypoint: create-resource-group
+  entrypoint: new-resource-group
   serviceAccountName: argo-workflow
   arguments:
     parameters:
@@ -16,7 +16,7 @@ spec:
       - name: resource-group-suffix
         value: rg-argo-
   templates:
-    - name: create-resource-group
+    - name: new-resource-group
       inputs:
         parameters:
           - name: subscription-id
@@ -30,7 +30,7 @@ spec:
         command: [ "pwsh" ]
         args: [
           "-Command",
-          "New-ResourceGroup",
+          "./New-ResourceGroup.ps1",
           "-SubscriptionId {{inputs.parameters.subscription-id}}",
           "-Location {{inputs.parameters.location}}",
           "-ResourceGroupSuffix {{inputs.parameters.resource-group-suffix}}"
