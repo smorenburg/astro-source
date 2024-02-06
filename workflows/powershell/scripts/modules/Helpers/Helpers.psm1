@@ -2,13 +2,13 @@ $ErrorActionPreference = "Stop"
 
 function Connect-Azure
 {
-    # TODO: Add more connection methods besides workload identity.
     param(
         [string]$SubscriptionId
     )
 
     Import-Module -Name Az.Accounts
 
+    # TODO: Add more connection methods besides workload identity.
     $federatedToken = Get-Content -Path $Env:AZURE_FEDERATED_TOKEN_FILE -Raw
 
     $account = @{
