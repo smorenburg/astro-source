@@ -11,4 +11,4 @@ spec:
     workflow:
       serviceAccount:
         annotations:
-          azure.workload.identity/client-id: 2b3f284e-8791-40fb-ba0a-4d8223e64abe
+          azure.workload.identity/client-id: bad30834-40dd-4cac-adfe-29cb18d19d24
