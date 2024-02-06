@@ -9,15 +9,7 @@ function Connect-Azure
 
     Import-Module -Name Az.Accounts
 
-    try
-    {
-        $federatedToken = Get-Content -Path $Env:AZURE_FEDERATED_TOKEN_FILE -Raw
-    }
-    catch
-    {
-        Write-Output -InputObject $PSItem
-        exit 1
-    }
+    $federatedToken = Get-Content -Path $Env:AZURE_FEDERATED_TOKEN_FILE -Raw
 
     $account = @{
         ApplicationId = $Env:AZURE_CLIENT_ID
@@ -26,15 +18,7 @@ function Connect-Azure
         FederatedToken = $federatedToken
     }
 
-    try
-    {
-        Connect-AzAccount @account -WarningAction:SilentlyContinue | Out-Null
-    }
-    catch
-    {
-        Write-Output -InputObject $PSItem
-        exit 1
-    }
+    Connect-AzAccount @account -WarningAction:SilentlyContinue | Out-Null
 }
 
 Export-ModuleMember -Function Connect-Azure
