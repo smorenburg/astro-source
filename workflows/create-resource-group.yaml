@@ -25,14 +25,12 @@ spec:
       metadata:
         labels:
           azure.workload.identity/use: "true"
-      continueOn:
-        failed: false
       container:
         image: smorenburg/powershell
         command: [ "pwsh" ]
         args: [
           "-Command",
-          "./Create-ResourceGroup.ps1",
+          "New-ResourceGroup",
           "-SubscriptionId {{inputs.parameters.subscription-id}}",
           "-Location {{inputs.parameters.location}}",
           "-ResourceGroupSuffix {{inputs.parameters.resource-group-suffix}}"
