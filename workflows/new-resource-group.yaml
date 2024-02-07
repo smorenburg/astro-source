@@ -13,7 +13,7 @@ spec:
         value: ae9db8ac-2682-4a98-ad36-7d13b2bd5a24
       - name: location
         value: northeurope
-      - name: resource-group-suffix
+      - name: resource-group-prefix
         value: rg-argo-
   templates:
     - name: new-resource-group
@@ -21,7 +21,7 @@ spec:
         parameters:
           - name: subscription-id
           - name: location
-          - name: resource-group-suffix
+          - name: resource-group-prefix
       metadata:
         labels:
           azure.workload.identity/use: "true"
@@ -33,6 +33,6 @@ spec:
           "New-ResourceGroup",
           "-SubscriptionId {{inputs.parameters.subscription-id}}",
           "-Location {{inputs.parameters.location}}",
-          "-ResourceGroupSuffix {{inputs.parameters.resource-group-suffix}}",
-          "-ConnectAzure"
+          "-ResourceGroupPrefix {{inputs.parameters.resource-group-prefix}}",
+          "-ConnectAzure WorkloadIdentity"
         ]
