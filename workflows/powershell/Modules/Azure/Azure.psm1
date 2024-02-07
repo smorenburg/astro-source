@@ -161,7 +161,7 @@ function New-ResourceGroup
         Specifies the location (region).
 
         .PARAMETER ConnectAzure
-        Specifies the connection method. Without the parameter no Azure connection will be made.
+        Specifies the connection method. Doesn't connect to Azure without specifying the parameter.
         The available connection methods are ServicePrincipal and WorkloadIdentity.
 
         .PARAMETER SubscriptionId
