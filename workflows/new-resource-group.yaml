@@ -30,8 +30,9 @@ spec:
         command: [ "pwsh" ]
         args: [
           "-Command",
-          "./New-ResourceGroup.ps1",
+          "New-ResourceGroup",
           "-SubscriptionId {{inputs.parameters.subscription-id}}",
           "-Location {{inputs.parameters.location}}",
-          "-ResourceGroupSuffix {{inputs.parameters.resource-group-suffix}}"
+          "-ResourceGroupSuffix {{inputs.parameters.resource-group-suffix}}",
+          "-ConnectAzure"
         ]

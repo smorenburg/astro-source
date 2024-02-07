@@ -1,6 +1,7 @@
 $ErrorActionPreference = "Stop"
 
 Import-Module -Name Az.Accounts
+Import-Module -Name Az.Resources
 
 function Connect-Azure
 {
@@ -20,8 +21,6 @@ function Connect-Azure
 
     Connect-AzAccount @account -WarningAction:SilentlyContinue | Out-Null
 }
-
-Export-ModuleMember -Function Connect-Azure
 
 function New-RandomString
 {
@@ -58,4 +57,34 @@ function New-RandomString
     return $randomString
 }
 
-Export-ModuleMember -Function New-RandomString
+function New-ResourceGroup
+{
+    [CmdletBinding(SupportsShouldProcess)]
+    param(
+        [string]$SubscriptionId,
+        [string]$Location,
+        [string]$ResourceGroupSuffix,
+        [switch]$ConnectAzure
+    )
+
+    try
+    {
+        if ($ConnectAzure)
+        {
+            Connect-Azure -SubscriptionId $SubscriptionId
+        }
+
+        $randomString = New-RandomString -Characters 6 -Lowercase -Numeric
+        $resourceGroupName = $ResourceGroupSuffix + $randomString
+
+        # TODO: Check for existing resource group.
+        New-AzResourceGroup -Name $resourceGroupName -Location $Location
+    }
+    catch
+    {
+        Write-Output -InputObject $PSItem
+        exit 1
+    }
+}
+
+Export-ModuleMember -Function New-ResourceGroup

@@ -1,7 +1,7 @@
 FROM mcr.microsoft.com/azure-powershell:alpine-3.17
 
-COPY /scripts /scripts
+ENV PSModulePath="$PSModulePath:/Modules"
 
-WORKDIR /scripts
+COPY /Modules /Modules
 
 CMD [ "pwsh", "-Command", "$PSVersionTable" ]
