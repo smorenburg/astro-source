@@ -192,11 +192,7 @@ function New-ResourceGroup
 
     try
     {
-        if ($ConnectAzure -eq "WorkloadIdentity")
-        {
-            Connect-Azure -Method "WorkloadIdentity" -SubscriptionId $SubscriptionId
-        }
-        elseif ($ConnectAzure -eq "ServicePrincipal")
+        if ($ConnectAzure -eq "ServicePrincipal")
         {
             $azure = @{
                 Method = "ServicePrincipal"
@@ -207,6 +203,10 @@ function New-ResourceGroup
             }
 
             Connect-Azure @azure
+        }
+        elseif ($ConnectAzure -eq "WorkloadIdentity")
+        {
+            Connect-Azure -Method "WorkloadIdentity" -SubscriptionId $SubscriptionId
         }
 
         $randomString = New-RandomString -Characters 6 -Lowercase -Numeric
