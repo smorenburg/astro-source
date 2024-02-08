@@ -215,8 +215,8 @@ function New-ResourceGroup
         $deployment = @{
             Location = $Location
             TemplateFile = "Templates/resourceGroup.bicep"
+            resourceLocation = $Location
             resourceGroupName = $ResourceGroupName
-            resourceGroupLocation = $Location
         }
 
         New-AzSubscriptionDeployment @deployment
