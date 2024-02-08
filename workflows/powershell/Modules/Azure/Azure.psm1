@@ -45,7 +45,7 @@ function Connect-Azure
 
     if ($Method -eq "ServicePrincipal")
     {
-        $secureString = $ClientSecret | ConvertTo-SecureString -AsPlainText -Force
+        $secureString = ConvertTo-SecureString -String $ClientSecret -AsPlainText -Force
         $credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $ApplicationId, $secureString
 
         $account = @{
@@ -54,7 +54,7 @@ function Connect-Azure
             SubscriptionId = $SubscriptionId
         }
 
-        Connect-AzAccount -ServicePrincipal @account
+        Connect-AzAccount -ServicePrincipal @account | Out-Null
     }
     elseif ($Method -eq "WorkloadIdentity")
     {
@@ -154,8 +154,8 @@ function New-ResourceGroup
         Creates a new resource group.
 
         .DESCRIPTION
-        Creates a new resource group.
-        Is used by the subsequent functions when CreateResourceGroup is $True.
+        Creates a new resource group. Is used by the subsequent functions when CreateResourceGroup is $True.
+        Checks if the resource group already exists. Succeeds if exists.
 
         .PARAMETER Location
         Specifies the location (region).
@@ -212,7 +212,12 @@ function New-ResourceGroup
             Connect-Azure -Method "WorkloadIdentity" -SubscriptionId $SubscriptionId
         }
 
-        New-AzResourceGroup -Name $resourceGroupName -Location $Location
+        Get-AzResourceGroup -Name $resourceGroupName -ErrorVariable absent -ErrorAction SilentlyContinue
+
+        if ($absent)
+        {
+            New-AzResourceGroup -Name $resourceGroupName -Location $Location
+        }
     }
     catch
     {
