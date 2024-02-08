@@ -212,11 +212,11 @@ function New-ResourceGroup
             Connect-Azure -Method "WorkloadIdentity" -SubscriptionId $SubscriptionId
         }
 
-        Get-AzResourceGroup -Name $resourceGroupName -ErrorVariable absent -ErrorAction SilentlyContinue | Out-Null
+        Get-AzResourceGroup -Name $ResourceGroupName -ErrorVariable absent -ErrorAction SilentlyContinue | Out-Null
 
         if ($absent)
         {
-            New-AzResourceGroup -Name $resourceGroupName -Location $Location
+            New-AzResourceGroup -Name $ResourceGroupName -Location $Location
         }
         else
         {
