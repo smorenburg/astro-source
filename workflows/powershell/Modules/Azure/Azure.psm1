@@ -141,8 +141,8 @@ function New-ResourceGroup
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [string]$Location,
-        [string]$ResourceGroupPrefix,
-        [string]$ConnectAzure,
+        [string]$ResourceGroupName,
+        [string]$ConnectMethod,
         [string]$SubscriptionId,
         [string]$ApplicationId,
         [string]$TenantId,
@@ -160,7 +160,10 @@ function New-ResourceGroup
         .PARAMETER Location
         Specifies the location (region).
 
-        .PARAMETER ConnectAzure
+        .PARAMETER ResourceGroupName
+        Specifies the resource group name.
+
+        .PARAMETER ConnectMethod
         Specifies the connection method. Without the parameter there will be no Azure connection established.
         The available connection methods are ServicePrincipal and WorkloadIdentity.
 
@@ -183,16 +186,16 @@ function New-ResourceGroup
         PS> New-ResourceGroup `
                 -SubscriptionId "ae9db8ac-2682-4a98-ad36-7d13b2bd5a24" `
                 -Location "northeurope" `
-                -ResourceGroupPrefix "rg-astro-" `
-                -ConnectAzure "WorkloadIdentity"
+                -ResourceGroupName "rg-astro" `
+                -ConnectMethod "WorkloadIdentity"
 
         .EXAMPLE
-        PS> New-ResourceGroup -Location "northeurope" -ResourceGroupPrefix "rg-astro-"
+        PS> New-ResourceGroup -Location "northeurope" -ResourceGroupName "rg-astro"
     #>
 
     try
     {
-        if ($ConnectAzure -eq "ServicePrincipal")
+        if ($ConnectMethod -eq "ServicePrincipal")
         {
             $azure = @{
                 Method = "ServicePrincipal"
@@ -204,15 +207,19 @@ function New-ResourceGroup
 
             Connect-Azure @azure
         }
-        elseif ($ConnectAzure -eq "WorkloadIdentity")
+        elseif ($ConnectMethod -eq "WorkloadIdentity")
         {
             Connect-Azure -Method "WorkloadIdentity" -SubscriptionId $SubscriptionId
         }
 
-        $randomString = New-RandomString -Characters 6 -Lowercase -Numeric
-        $resourceGroupName = $ResourceGroupPrefix + $randomString
+        $deployment = @{
+            Location = $Location
+            TemplateFile = "Templates/resourceGroup.bicep"
+            resourceGroupName = $ResourceGroupName
+            resourceGroupLocation = $Location
+        }
 
-        New-AzResourceGroup -Name $resourceGroupName -Location $Location
+        New-AzSubscriptionDeployment @deployment
     }
     catch
     {
