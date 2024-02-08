@@ -13,13 +13,13 @@ spec:
         value: ae9db8ac-2682-4a98-ad36-7d13b2bd5a24
       - name: location
         value: northeurope
+      - name: resource-group-name
+        value: rg-argo
       - name: create-resource-group
         value: $True
         enum:
           - $True
           - $False
-      - name: resource-group-name
-        value: rg-argo
       - name: storage-account-prefix
         value: saargo
       - name: storage-account-sku
@@ -30,8 +30,8 @@ spec:
         parameters:
           - name: subscription-id
           - name: location
-          - name: create-resource-group
           - name: resource-group-name
+          - name: create-resource-group
           - name: storage-account-prefix
           - name: storage-account-sku
       metadata:
@@ -45,8 +45,8 @@ spec:
           "New-StorageAccount",
           "-SubscriptionId {{inputs.parameters.subscription-id}}",
           "-Location {{inputs.parameters.location}}",
-          "-CreateResourceGroup {{inputs.parameters.create-resource-group}}",
           "-ResourceGroupName {{inputs.parameters.resource-group-name}}",
+          "-CreateResourceGroup {{inputs.parameters.create-resource-group}}",
           "-StorageAccountPrefix {{inputs.parameters.storage-account-prefix}}",
           "-StorageAccountSku {{inputs.parameters.storage-account-sku}}",
           "-ConnectMethod WorkloadIdentity"

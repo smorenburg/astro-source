@@ -228,8 +228,8 @@ function New-StorageAccount
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [string]$Location,
-        [bool]$CreateResourceGroup,
         [string]$ResourceGroupName,
+        [bool]$CreateResourceGroup,
         [string]$StorageAccountPrefix,
         [string]$storageAccountSku,
         [string]$ConnectMethod,
@@ -250,11 +250,11 @@ function New-StorageAccount
         .PARAMETER Location
         Specifies the location (region).
 
-        .PARAMETER CreateResourceGroup
-        Specifies creating the resource group.
-
         .PARAMETER ResourceGroupName
         Specifies the resource group name.
+
+        .PARAMETER CreateResourceGroup
+        Specifies creating the resource group.
 
         .PARAMETER StorageAccountName
         Specifies the prefix for the storage account.
