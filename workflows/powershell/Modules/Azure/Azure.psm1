@@ -155,7 +155,7 @@ function New-ResourceGroup
 
         .DESCRIPTION
         Creates a new resource group. Is used by the subsequent functions when CreateResourceGroup is $True.
-        Checks if the resource group already exists. Succeeds if exists.
+        Checks if the resource group already exists. Fails if exists.
 
         .PARAMETER Location
         Specifies the location (region).
@@ -212,11 +212,16 @@ function New-ResourceGroup
             Connect-Azure -Method "WorkloadIdentity" -SubscriptionId $SubscriptionId
         }
 
-        Get-AzResourceGroup -Name $resourceGroupName -ErrorVariable absent -ErrorAction SilentlyContinue
+        Get-AzResourceGroup -Name $resourceGroupName -ErrorVariable absent -ErrorAction SilentlyContinue | Out-Null
 
         if ($absent)
         {
             New-AzResourceGroup -Name $resourceGroupName -Location $Location
+        }
+        else
+        {
+            Write-Output -InputObject "Error: Resource group $ResourceGroupName already exists."
+            exit 1
         }
     }
     catch
