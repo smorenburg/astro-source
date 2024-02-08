@@ -155,7 +155,7 @@ function New-ResourceGroup
 
         .DESCRIPTION
         Creates a new resource group.
-        Using a prefix followed by a random string of six characters container lowercase and numeric characters.
+        Is used by the subsequent functions when CreateResourceGroup is $True.
 
         .PARAMETER Location
         Specifies the location (region).
@@ -186,11 +186,11 @@ function New-ResourceGroup
         PS> New-ResourceGroup `
                 -SubscriptionId "ae9db8ac-2682-4a98-ad36-7d13b2bd5a24" `
                 -Location "northeurope" `
-                -ResourceGroupName "rg-astro" `
+                -ResourceGroupName "rg-argo" `
                 -ConnectMethod "WorkloadIdentity"
 
         .EXAMPLE
-        PS> New-ResourceGroup -Location "northeurope" -ResourceGroupName "rg-astro"
+        PS> New-ResourceGroup -Location "northeurope" -ResourceGroupName "rg-argo"
     #>
 
     try
@@ -212,14 +212,7 @@ function New-ResourceGroup
             Connect-Azure -Method "WorkloadIdentity" -SubscriptionId $SubscriptionId
         }
 
-        $deployment = @{
-            Location = $Location
-            TemplateFile = "Templates/resourceGroup.bicep"
-            resourceLocation = $Location
-            resourceGroupName = $ResourceGroupName
-        }
-
-        New-AzSubscriptionDeployment @deployment
+        New-AzResourceGroup -Name $resourceGroupName -Location $Location
     }
     catch
     {
@@ -229,3 +222,118 @@ function New-ResourceGroup
 }
 
 Export-ModuleMember -Function New-ResourceGroup
+
+function New-StorageAccount
+{
+    [CmdletBinding(SupportsShouldProcess)]
+    param(
+        [string]$Location,
+        [bool]$CreateResourceGroup,
+        [string]$ResourceGroupName,
+        [string]$StorageAccountPrefix,
+        [string]$storageAccountSku,
+        [string]$ConnectMethod,
+        [string]$SubscriptionId,
+        [string]$ApplicationId,
+        [string]$TenantId,
+        [string]$ClientSecret
+    )
+
+    <#
+        .SYNOPSIS
+        Creates a new storage account.
+
+        .DESCRIPTION
+        Creates a new storage account.
+        Using a prefix followed by a random string of 6 characters.
+
+        .PARAMETER Location
+        Specifies the location (region).
+
+        .PARAMETER CreateResourceGroup
+        Specifies creating the resource group.
+
+        .PARAMETER ResourceGroupName
+        Specifies the resource group name.
+
+        .PARAMETER StorageAccountName
+        Specifies the prefix for the storage account.
+
+        .PARAMETER storageAccountSku
+        Specifies the SKU for the storage account.
+
+        .PARAMETER ConnectMethod
+        Specifies the connection method. Without the parameter there will be no Azure connection established.
+        The available connection methods are ServicePrincipal and WorkloadIdentity.
+
+        .PARAMETER SubscriptionId
+        Specifies the subscription identifier.
+
+        .PARAMETER ApplicationId
+        Specifies the application identifier. Only needed when using the ServicePrincipal connection method.
+
+        .PARAMETER TenantId
+        Specifies the tenant identifier. Only needed when using the ServicePrincipal connection method.
+
+        .PARAMETER ClientSecret
+        Specifies the client secret. Only needed when using the ServicePrincipal connection method.
+
+        .INPUTS
+        None. You can't pipe objects New-ResourceGroup.
+
+        .EXAMPLE
+        PS> New-StorageAccount `
+                -SubscriptionId "ae9db8ac-2682-4a98-ad36-7d13b2bd5a24" `
+                -Location "northeurope" `
+                -CreateResourceGroup $True `
+                -ResourceGroupName rg-argo `
+                -StorageAccountPrefix "saargo" `
+                -ConnectMethod "WorkloadIdentity"
+
+        .EXAMPLE
+        PS> New-StorageAccount -Location "northeurope" -ResourceGroupName rg-argo -StorageAccountPrefix "saargo"
+    #>
+
+    try
+    {
+        if ($ConnectMethod -eq "ServicePrincipal")
+        {
+            $azure = @{
+                Method = "ServicePrincipal"
+                ApplicationId = $ApplicationId
+                TenantId = $TenantId
+                SubscriptionId = $SubscriptionId
+                ClientSecret = $ClientSecret
+            }
+
+            Connect-Azure @azure
+        }
+        elseif ($ConnectMethod -eq "WorkloadIdentity")
+        {
+            Connect-Azure -Method "WorkloadIdentity" -SubscriptionId $SubscriptionId
+        }
+
+        if ($CreateResourceGroup)
+        {
+            New-ResourceGroup -Location $Location -ResourceGroupName $ResourceGroupName
+        }
+
+        $randomString = New-RandomString -Characters 6 -Lowercase -Numeric
+
+        $deployment = @{
+            ResourceGroupName = $ResourceGroupName
+            TemplateFile = "Templates/storageAccount.bicep"
+            storageAccountName = $StorageAccountPrefix + $randomString
+            storageAccountSku = $storageAccountSku
+        }
+
+        New-AzResourceGroupDeployment @deployment
+    }
+    catch
+    {
+        Write-Output -InputObject $PSItem
+        exit 1
+    }
+}
+
+Export-ModuleMember -Function New-StorageAccount

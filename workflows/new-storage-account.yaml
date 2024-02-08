@@ -1,0 +1,53 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: new-storage-account
+  namespace: argo
+spec:
+  entrypoint: new-storage-account
+  serviceAccountName: argo-workflow
+  arguments:
+    parameters:
+      - name: subscription-id
+        value: ae9db8ac-2682-4a98-ad36-7d13b2bd5a24
+      - name: location
+        value: northeurope
+      - name: create-resource-group
+        value: $True
+        enum:
+          - $True
+          - $False
+      - name: resource-group-name
+        value: rg-argo
+      - name: storage-account-prefix
+        value: saargo
+      - name: storage-account-sku
+        value: Standard_LRS
+  templates:
+    - name: new-storage-account
+      inputs:
+        parameters:
+          - name: subscription-id
+          - name: location
+          - name: create-resource-group
+          - name: resource-group-name
+          - name: storage-account-prefix
+          - name: storage-account-sku
+      metadata:
+        labels:
+          azure.workload.identity/use: "true"
+      container:
+        image: smorenburg/powershell
+        command: [ "pwsh" ]
+        args: [
+          "-Command",
+          "New-StorageAccount",
+          "-SubscriptionId {{inputs.parameters.subscription-id}}",
+          "-Location {{inputs.parameters.location}}",
+          "-CreateResourceGroup {{inputs.parameters.create-resource-group}}",
+          "-ResourceGroupName {{inputs.parameters.resource-group-name}}",
+          "-StorageAccountPrefix {{inputs.parameters.storage-account-prefix}}",
+          "-StorageAccountSku {{inputs.parameters.storage-account-sku}}",
+          "-ConnectMethod WorkloadIdentity"
+        ]
