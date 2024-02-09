@@ -54,6 +54,8 @@ data "atlas_schema" "default" {
     kubernetes_namespace_v1.default.metadata[0].name,
     ".svc.cluster.local"
   ])
+
+  depends_on = [kubernetes_deployment_v1.mysql_schema]
 }
 
 locals {
