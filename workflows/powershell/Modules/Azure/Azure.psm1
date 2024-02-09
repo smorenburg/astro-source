@@ -154,7 +154,7 @@ function New-ResourceGroup
         Creates a new resource group.
 
         .DESCRIPTION
-        Creates a new resource group. Is used by the subsequent functions when CreateResourceGroup is $True.
+        Creates a new resource group. Is used by the subsequent functions when NewResourceGroup is $True.
         Checks if the resource group already exists. Fails if exists.
 
         .PARAMETER Location
@@ -239,7 +239,7 @@ function New-StorageAccount
     param(
         [string]$Location,
         [string]$ResourceGroupName,
-        [bool]$CreateResourceGroup,
+        [bool]$NewResourceGroup,
         [string]$StorageAccountPrefix,
         [string]$storageAccountSku,
         [string]$ConnectMethod,
@@ -263,8 +263,8 @@ function New-StorageAccount
         .PARAMETER ResourceGroupName
         Specifies the resource group name.
 
-        .PARAMETER CreateResourceGroup
-        Specifies creating the resource group.
+        .PARAMETER NewResourceGroup
+        Specifies creating the new resource group.
 
         .PARAMETER StorageAccountName
         Specifies the prefix for the storage account.
@@ -295,7 +295,7 @@ function New-StorageAccount
         PS> New-StorageAccount `
                 -SubscriptionId "ae9db8ac-2682-4a98-ad36-7d13b2bd5a24" `
                 -Location "northeurope" `
-                -CreateResourceGroup $True `
+                -NewResourceGroup $True `
                 -ResourceGroupName rg-argo `
                 -StorageAccountPrefix "saargo" `
                 -ConnectMethod "WorkloadIdentity"
@@ -323,7 +323,7 @@ function New-StorageAccount
             Connect-Azure -Method "WorkloadIdentity" -SubscriptionId $SubscriptionId
         }
 
-        if ($CreateResourceGroup)
+        if ($NewResourceGroup)
         {
             New-ResourceGroup -Location $Location -ResourceGroupName $ResourceGroupName
         }
