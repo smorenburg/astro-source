@@ -34,5 +34,5 @@ spec:
           "-SubscriptionId {{inputs.parameters.subscription-id}}",
           "-Location {{inputs.parameters.location}}",
           "-ResourceGroupName {{inputs.parameters.resource-group-name}}",
-          "-ConnectMethod WorkloadIdentity"
+          "-ConnectAzure"
         ]

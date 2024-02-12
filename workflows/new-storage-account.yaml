@@ -49,5 +49,5 @@ spec:
           "-NewResourceGroup {{inputs.parameters.new-resource-group}}",
           "-StorageAccountPrefix {{inputs.parameters.storage-account-prefix}}",
           "-StorageAccountSku {{inputs.parameters.storage-account-sku}}",
-          "-ConnectMethod WorkloadIdentity"
+          "-ConnectAzure"
         ]
