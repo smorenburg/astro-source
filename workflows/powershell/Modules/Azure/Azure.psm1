@@ -254,7 +254,7 @@ function New-StorageAccount
             storageAccountSku = $StorageAccountSku
         }
 
-        New-AzResourceGroupDeployment @deployment
+        New-AzResourceGroupDeployment @deployment -WarningAction:SilentlyContinue
     }
     catch
     {
