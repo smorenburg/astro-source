@@ -3,28 +3,28 @@ $ErrorActionPreference = "Stop"
 Import-Module -Name Az.Accounts
 Import-Module -Name Az.Resources
 
+<#
+    .SYNOPSIS
+    Connects to Azure.
+
+    .DESCRIPTION
+    Connects to Azure using workload identity.
+
+    .PARAMETER SubscriptionId
+    Specifies the subscription identifier.
+
+    .INPUTS
+    None. You can't pipe objects to Connect-Azure.
+
+    .EXAMPLE
+    PS> Connect-Azure -SubscriptionId "ae9db8ac-2682-4a98-ad36-7d13b2bd5a24"
+#>
+
 function Connect-Azure
 {
     param(
         [string]$SubscriptionId
     )
-
-    <#
-        .SYNOPSIS
-        Connects to Azure.
-
-        .DESCRIPTION
-        Connects to Azure using workload identity.
-
-        .PARAMETER SubscriptionId
-        Specifies the subscription identifier.
-
-        .INPUTS
-        None. You can't pipe objects to Connect-Azure.
-
-        .EXAMPLE
-        PS> Connect-Azure -SubscriptionId "ae9db8ac-2682-4a98-ad36-7d13b2bd5a24"
-    #>
 
     $federatedToken = Get-Content -Path $Env:AZURE_FEDERATED_TOKEN_FILE -Raw
 
@@ -38,6 +38,36 @@ function Connect-Azure
     Connect-AzAccount @account -WarningAction:SilentlyContinue | Out-Null
 }
 
+<#
+    .SYNOPSIS
+    Generates a random string using different character options.
+
+    .DESCRIPTION
+    Generates a random string using different character options.
+    The character options are Lowercase, Uppercase, Numeric, and Special.
+
+    .PARAMETER Characters
+    Specifies the number of characters.
+
+    .PARAMETER Lowercase
+    Enables lowercase characters.
+
+    .PARAMETER Uppercase
+    Enables uppercase characters.
+
+    .PARAMETER Numeric
+    Enables numeric characters.
+
+    .PARAMETER Special
+    Enables special characters.
+
+    .INPUTS
+    None. You can't pipe objects to New-RandomString.
+
+    .EXAMPLE
+    PS> New-RandomString -Characters 6 -Lowercase -Numeric
+#>
+
 function New-RandomString
 {
     [CmdletBinding(SupportsShouldProcess)]
@@ -48,36 +78,6 @@ function New-RandomString
         [switch]$Numeric,
         [switch]$Special
     )
-
-    <#
-        .SYNOPSIS
-        Generates a random string using different character options.
-
-        .DESCRIPTION
-        Generates a random string using different character options.
-        The character options are Lowercase, Uppercase, Numeric, and Special.
-
-        .PARAMETER Characters
-        Specifies the number of characters.
-
-        .PARAMETER Lowercase
-        Enables lowercase characters.
-
-        .PARAMETER Uppercase
-        Enables uppercase characters.
-
-        .PARAMETER Numeric
-        Enables numeric characters.
-
-        .PARAMETER Special
-        Enables special characters.
-
-        .INPUTS
-        None. You can't pipe objects to New-RandomString.
-
-        .EXAMPLE
-        PS> New-RandomString -Characters 6 -Lowercase -Numeric
-    #>
 
     $string = $empty
 
@@ -103,6 +103,40 @@ function New-RandomString
     return $randomString
 }
 
+<#
+    .SYNOPSIS
+    Creates a new resource group.
+
+    .DESCRIPTION
+    Creates a new resource group. Is used by the subsequent functions when NewResourceGroup is $True.
+    Checks if the resource group already exists. Fails if exists.
+
+    .PARAMETER Location
+    Specifies the location (region).
+
+    .PARAMETER ResourceGroupName
+    Specifies the resource group name.
+
+    .PARAMETER ConnectAzure
+    When specified, an Azure connection will be established.
+
+    .PARAMETER SubscriptionId
+    Specifies the subscription identifier.
+
+    .INPUTS
+    None. You can't pipe objects New-ResourceGroup.
+
+    .EXAMPLE
+    PS> New-ResourceGroup `
+            -SubscriptionId "ae9db8ac-2682-4a98-ad36-7d13b2bd5a24" `
+            -Location "northeurope" `
+            -ResourceGroupName "rg-argo" `
+            -ConnectAzure
+
+    .EXAMPLE
+    PS> New-ResourceGroup -Location "northeurope" -ResourceGroupName "rg-argo"
+#>
+
 function New-ResourceGroup
 {
     [CmdletBinding(SupportsShouldProcess)]
@@ -112,40 +146,6 @@ function New-ResourceGroup
         [switch]$ConnectAzure,
         [string]$SubscriptionId
     )
-
-    <#
-        .SYNOPSIS
-        Creates a new resource group.
-
-        .DESCRIPTION
-        Creates a new resource group. Is used by the subsequent functions when NewResourceGroup is $True.
-        Checks if the resource group already exists. Fails if exists.
-
-        .PARAMETER Location
-        Specifies the location (region).
-
-        .PARAMETER ResourceGroupName
-        Specifies the resource group name.
-
-        .PARAMETER ConnectAzure
-        When specified, an Azure connection will be established.
-
-        .PARAMETER SubscriptionId
-        Specifies the subscription identifier.
-
-        .INPUTS
-        None. You can't pipe objects New-ResourceGroup.
-
-        .EXAMPLE
-        PS> New-ResourceGroup `
-                -SubscriptionId "ae9db8ac-2682-4a98-ad36-7d13b2bd5a24" `
-                -Location "northeurope" `
-                -ResourceGroupName "rg-argo" `
-                -ConnectAzure
-
-        .EXAMPLE
-        PS> New-ResourceGroup -Location "northeurope" -ResourceGroupName "rg-argo"
-    #>
 
     try
     {
@@ -175,6 +175,51 @@ function New-ResourceGroup
 
 Export-ModuleMember -Function New-ResourceGroup
 
+<#
+    .SYNOPSIS
+    Creates a new storage account.
+
+    .DESCRIPTION
+    Creates a new storage account.
+    Using a prefix followed by a random string of 6 characters.
+
+    .PARAMETER Location
+    Specifies the location (region).
+
+    .PARAMETER ResourceGroupName
+    Specifies the resource group name.
+
+    .PARAMETER NewResourceGroup
+    Specifies creating the new resource group.
+
+    .PARAMETER StorageAccountName
+    Specifies the prefix for the storage account.
+
+    .PARAMETER StorageAccountSku
+    Specifies the SKU for the storage account.
+
+    .PARAMETER ConnectAzure
+    When specified, an Azure connection will be established.
+
+    .PARAMETER SubscriptionId
+    Specifies the subscription identifier.
+
+    .INPUTS
+    None. You can't pipe objects New-ResourceGroup.
+
+    .EXAMPLE
+    PS> New-StorageAccount `
+            -SubscriptionId "ae9db8ac-2682-4a98-ad36-7d13b2bd5a24" `
+            -Location "northeurope" `
+            -NewResourceGroup $True `
+            -ResourceGroupName rg-argo `
+            -StorageAccountPrefix "saargo" `
+            -ConnectAzure
+
+    .EXAMPLE
+    PS> New-StorageAccount -Location "northeurope" -ResourceGroupName rg-argo -StorageAccountPrefix "saargo"
+#>
+
 function New-StorageAccount
 {
     [CmdletBinding(SupportsShouldProcess)]
@@ -187,51 +232,6 @@ function New-StorageAccount
         [switch]$ConnectAzure,
         [string]$SubscriptionId
     )
-
-    <#
-        .SYNOPSIS
-        Creates a new storage account.
-
-        .DESCRIPTION
-        Creates a new storage account.
-        Using a prefix followed by a random string of 6 characters.
-
-        .PARAMETER Location
-        Specifies the location (region).
-
-        .PARAMETER ResourceGroupName
-        Specifies the resource group name.
-
-        .PARAMETER NewResourceGroup
-        Specifies creating the new resource group.
-
-        .PARAMETER StorageAccountName
-        Specifies the prefix for the storage account.
-
-        .PARAMETER StorageAccountSku
-        Specifies the SKU for the storage account.
-
-        .PARAMETER ConnectAzure
-        When specified, an Azure connection will be established.
-
-        .PARAMETER SubscriptionId
-        Specifies the subscription identifier.
-
-        .INPUTS
-        None. You can't pipe objects New-ResourceGroup.
-
-        .EXAMPLE
-        PS> New-StorageAccount `
-                -SubscriptionId "ae9db8ac-2682-4a98-ad36-7d13b2bd5a24" `
-                -Location "northeurope" `
-                -NewResourceGroup $True `
-                -ResourceGroupName rg-argo `
-                -StorageAccountPrefix "saargo" `
-                -ConnectAzure
-
-        .EXAMPLE
-        PS> New-StorageAccount -Location "northeurope" -ResourceGroupName rg-argo -StorageAccountPrefix "saargo"
-    #>
 
     try
     {
