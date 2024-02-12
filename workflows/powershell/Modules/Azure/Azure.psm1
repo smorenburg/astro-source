@@ -6,69 +6,36 @@ Import-Module -Name Az.Resources
 function Connect-Azure
 {
     param(
-        [string]$Method,
-        [string]$ApplicationId,
-        [string]$TenantId,
-        [string]$SubscriptionId,
-        [string]$ClientSecret
+        [string]$SubscriptionId
     )
 
     <#
         .SYNOPSIS
-        Connects to Azure using different connection methods.
+        Connects to Azure.
 
         .DESCRIPTION
-        Connects to Azure using different connection methods.
-        The available connection methods are ServicePrincipal and WorkloadIdentity.
-
-        .PARAMETER Method
-        Specifies the method.
-
-        .PARAMETER ApplicationId
-        The application identifier. Only needed when using the ServicePrincipal connection method.
-
-        .PARAMETER TenantId
-        The tenant identifier. Only needed when using the ServicePrincipal connection method.
+        Connects to Azure using workload identity.
 
         .PARAMETER SubscriptionId
-        The subscription identifier.
-
-        .PARAMETER ClientSecret
-        The client secret. Only needed when using the ServicePrincipal connection method.
+        Specifies the subscription identifier.
 
         .INPUTS
         None. You can't pipe objects to Connect-Azure.
 
         .EXAMPLE
-        PS> Connect-Azure -Type "WorkloadIdentity" -SubscriptionId "ae9db8ac-2682-4a98-ad36-7d13b2bd5a24"
+        PS> Connect-Azure -SubscriptionId "ae9db8ac-2682-4a98-ad36-7d13b2bd5a24"
     #>
 
-    if ($Method -eq "ServicePrincipal")
-    {
-        $secureString = ConvertTo-SecureString -String $ClientSecret -AsPlainText -Force
-        $credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $ApplicationId, $secureString
+    $federatedToken = Get-Content -Path $Env:AZURE_FEDERATED_TOKEN_FILE -Raw
 
-        $account = @{
-            Credential = $credential
-            TenantId = $TenantId
-            SubscriptionId = $SubscriptionId
-        }
-
-        Connect-AzAccount -ServicePrincipal @account | Out-Null
+    $account = @{
+        ApplicationId = $Env:AZURE_CLIENT_ID
+        TenantId = $Env:AZURE_TENANT_ID
+        SubscriptionId = $SubscriptionId
+        FederatedToken = $federatedToken
     }
-    elseif ($Method -eq "WorkloadIdentity")
-    {
-        $federatedToken = Get-Content -Path $Env:AZURE_FEDERATED_TOKEN_FILE -Raw
 
-        $account = @{
-            ApplicationId = $Env:AZURE_CLIENT_ID
-            TenantId = $Env:AZURE_TENANT_ID
-            SubscriptionId = $SubscriptionId
-            FederatedToken = $federatedToken
-        }
-
-        Connect-AzAccount @account -WarningAction:SilentlyContinue | Out-Null
-    }
+    Connect-AzAccount @account -WarningAction:SilentlyContinue | Out-Null
 }
 
 function New-RandomString
@@ -142,11 +109,8 @@ function New-ResourceGroup
     param(
         [string]$Location,
         [string]$ResourceGroupName,
-        [string]$ConnectMethod,
-        [string]$SubscriptionId,
-        [string]$ApplicationId,
-        [string]$TenantId,
-        [string]$ClientSecret
+        [switch]$ConnectAzure,
+        [string]$SubscriptionId
     )
 
     <#
@@ -163,21 +127,11 @@ function New-ResourceGroup
         .PARAMETER ResourceGroupName
         Specifies the resource group name.
 
-        .PARAMETER ConnectMethod
-        Specifies the connection method. Without the parameter there will be no Azure connection established.
-        The available connection methods are ServicePrincipal and WorkloadIdentity.
+        .PARAMETER ConnectAzure
+        When specified, an Azure connection will be established.
 
         .PARAMETER SubscriptionId
-        The subscription identifier.
-
-        .PARAMETER ApplicationId
-        The application identifier. Only needed when using the ServicePrincipal connection method.
-
-        .PARAMETER TenantId
-        The tenant identifier. Only needed when using the ServicePrincipal connection method.
-
-        .PARAMETER ClientSecret
-        The client secret. Only needed when using the ServicePrincipal connection method.
+        Specifies the subscription identifier.
 
         .INPUTS
         None. You can't pipe objects New-ResourceGroup.
@@ -187,7 +141,7 @@ function New-ResourceGroup
                 -SubscriptionId "ae9db8ac-2682-4a98-ad36-7d13b2bd5a24" `
                 -Location "northeurope" `
                 -ResourceGroupName "rg-argo" `
-                -ConnectMethod "WorkloadIdentity"
+                -ConnectAzure
 
         .EXAMPLE
         PS> New-ResourceGroup -Location "northeurope" -ResourceGroupName "rg-argo"
@@ -195,21 +149,9 @@ function New-ResourceGroup
 
     try
     {
-        if ($ConnectMethod -eq "ServicePrincipal")
+        if ($ConnectAzure)
         {
-            $azure = @{
-                Method = "ServicePrincipal"
-                ApplicationId = $ApplicationId
-                TenantId = $TenantId
-                SubscriptionId = $SubscriptionId
-                ClientSecret = $ClientSecret
-            }
-
-            Connect-Azure @azure
-        }
-        elseif ($ConnectMethod -eq "WorkloadIdentity")
-        {
-            Connect-Azure -Method "WorkloadIdentity" -SubscriptionId $SubscriptionId
+            Connect-Azure -SubscriptionId $SubscriptionId
         }
 
         Get-AzResourceGroup -Name $ResourceGroupName -ErrorVariable absent -ErrorAction SilentlyContinue | Out-Null
@@ -241,12 +183,9 @@ function New-StorageAccount
         [string]$ResourceGroupName,
         [bool]$NewResourceGroup,
         [string]$StorageAccountPrefix,
-        [string]$storageAccountSku,
-        [string]$ConnectMethod,
-        [string]$SubscriptionId,
-        [string]$ApplicationId,
-        [string]$TenantId,
-        [string]$ClientSecret
+        [string]$StorageAccountSku,
+        [switch]$ConnectAzure,
+        [string]$SubscriptionId
     )
 
     <#
@@ -269,24 +208,14 @@ function New-StorageAccount
         .PARAMETER StorageAccountName
         Specifies the prefix for the storage account.
 
-        .PARAMETER storageAccountSku
+        .PARAMETER StorageAccountSku
         Specifies the SKU for the storage account.
 
-        .PARAMETER ConnectMethod
-        Specifies the connection method. Without the parameter there will be no Azure connection established.
-        The available connection methods are ServicePrincipal and WorkloadIdentity.
+        .PARAMETER ConnectAzure
+        When specified, an Azure connection will be established.
 
         .PARAMETER SubscriptionId
         Specifies the subscription identifier.
-
-        .PARAMETER ApplicationId
-        Specifies the application identifier. Only needed when using the ServicePrincipal connection method.
-
-        .PARAMETER TenantId
-        Specifies the tenant identifier. Only needed when using the ServicePrincipal connection method.
-
-        .PARAMETER ClientSecret
-        Specifies the client secret. Only needed when using the ServicePrincipal connection method.
 
         .INPUTS
         None. You can't pipe objects New-ResourceGroup.
@@ -298,7 +227,7 @@ function New-StorageAccount
                 -NewResourceGroup $True `
                 -ResourceGroupName rg-argo `
                 -StorageAccountPrefix "saargo" `
-                -ConnectMethod "WorkloadIdentity"
+                -ConnectAzure
 
         .EXAMPLE
         PS> New-StorageAccount -Location "northeurope" -ResourceGroupName rg-argo -StorageAccountPrefix "saargo"
@@ -306,21 +235,9 @@ function New-StorageAccount
 
     try
     {
-        if ($ConnectMethod -eq "ServicePrincipal")
+        if ($ConnectAzure)
         {
-            $azure = @{
-                Method = "ServicePrincipal"
-                ApplicationId = $ApplicationId
-                TenantId = $TenantId
-                SubscriptionId = $SubscriptionId
-                ClientSecret = $ClientSecret
-            }
-
-            Connect-Azure @azure
-        }
-        elseif ($ConnectMethod -eq "WorkloadIdentity")
-        {
-            Connect-Azure -Method "WorkloadIdentity" -SubscriptionId $SubscriptionId
+            Connect-Azure -SubscriptionId $SubscriptionId
         }
 
         if ($NewResourceGroup)
@@ -334,7 +251,7 @@ function New-StorageAccount
             ResourceGroupName = $ResourceGroupName
             TemplateFile = "Templates/storageAccount.bicep"
             storageAccountName = $StorageAccountPrefix + $randomString
-            storageAccountSku = $storageAccountSku
+            storageAccountSku = $StorageAccountSku
         }
 
         New-AzResourceGroupDeployment @deployment
