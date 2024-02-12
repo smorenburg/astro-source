@@ -24,7 +24,7 @@ function Connect-Azure
 {
     [CmdletBinding()]
     param(
-        [string] $SubscriptionId
+        [string]$SubscriptionId
     )
     process
     {
@@ -75,11 +75,11 @@ function New-RandomString
 {
     [CmdletBinding(SupportsShouldProcess)]
     param(
-        [int]    $Characters,
-        [switch] $Lowercase,
-        [switch] $Uppercase,
-        [switch] $Numeric,
-        [switch] $Special
+        [int]$Characters,
+        [switch]$Lowercase,
+        [switch]$Uppercase,
+        [switch]$Numeric,
+        [switch]$Special
     )
     process
     {
@@ -146,10 +146,10 @@ function New-ResourceGroup
 {
     [CmdletBinding(SupportsShouldProcess)]
     param(
-        [switch] $ConnectAzure,
-        [string] $SubscriptionId,
-        [string] $ResourceGroupName,
-        [string] $Location
+        [switch]$ConnectAzure,
+        [string]$SubscriptionId,
+        [string]$ResourceGroupName,
+        [string]$Location
     )
     process
     {
@@ -164,7 +164,7 @@ function New-ResourceGroup
 
             if ($absent)
             {
-                New-AzResourceGroup -Name $ResourceGroupName -Location $Location -Tag @{ Provisioner = "SuperMaestro"; Purpose = "Testing"; ResourceOwner = "***REMOVED***" } -Verbose
+                New-AzResourceGroup -Name $ResourceGroupName -Location $Location -Verbose
             }
             else
             {
@@ -231,13 +231,13 @@ function New-StorageAccount
 {
     [CmdletBinding(SupportsShouldProcess)]
     param(
-        [switch] $ConnectAzure,
-        [string] $SubscriptionId,
-        [string] $ResourceGroupName,
-        [bool]   $NewResourceGroup,
-        [string] $Location,
-        [string] $StorageAccountPrefix,
-        [string] $StorageAccountSku
+        [switch]$ConnectAzure,
+        [string]$SubscriptionId,
+        [string]$ResourceGroupName,
+        [bool]$NewResourceGroup,
+        [string]$Location,
+        [string]$StorageAccountPrefix,
+        [string]$StorageAccountSku
     )
     process
     {
@@ -282,15 +282,15 @@ function New-VirtualNetwork
 {
     [CmdletBinding(SupportsShouldProcess)]
     param(
-        [switch] $ConnectAzure,
-        [string] $SubscriptionId,
-        [string] $ResourceGroupName,
-        [bool]   $NewResourceGroup,
-        [string] $Location,
-        [string] $VirtualNetworkName,
-        [string] $VirtualNetworkAddressPrefix,
-        [string] $SubnetName,
-        [string] $SubnetAddressPrefix
+        [switch]$ConnectAzure,
+        [string]$SubscriptionId,
+        [string]$ResourceGroupName,
+        [bool]$NewResourceGroup,
+        [string]$Location,
+        [string]$VirtualNetworkName,
+        [string]$VirtualNetworkAddressPrefix,
+        [string]$SubnetName,
+        [string]$SubnetAddressPrefix
     )
     process
     {
@@ -335,26 +335,26 @@ function New-VirtualMachine
 {
     [CmdletBinding(SupportsShouldProcess)]
     param(
-        [switch] $ConnectAzure,
-        [string] $SubscriptionId,
-        [string] $ResourceGroupName,
-        [bool]   $NewResourceGroup,
-        [string] $Location,
-        [string] $VirtualNetworkResourceGroupName,
-        [string] $VirtualNetworkName,
-        [string] $SubnetName,
-        [string] $VirtualMachineName,
-        [string] $AvailabilityZone,
-        [string] $VirtualMachineSize,
-        [string] $Hostname,
+        [switch]$ConnectAzure,
+        [string]$SubscriptionId,
+        [string]$ResourceGroupName,
+        [bool]$NewResourceGroup,
+        [string]$Location,
+        [string]$VirtualNetworkResourceGroupName,
+        [string]$VirtualNetworkName,
+        [string]$SubnetName,
+        [string]$VirtualMachineName,
+        [string]$AvailabilityZone,
+        [string]$VirtualMachineSize,
+        [string]$Hostname,
 
         [ValidateSet("Ubuntu")]
-        [string] $Image,
+        [string]$Image,
 
-        [string] $AdminUsername,
-        [string] $AdminPassword,
-        [int]    $OsDiskSizeGb,
-        [string] $OsDiskType
+        [string]$AdminUsername,
+        [string]$AdminPassword,
+        [int]$OSDiskSizeGB,
+        [string]$OSDiskType
     )
     process
     {
@@ -389,8 +389,8 @@ function New-VirtualMachine
                 image = $imageReference
                 adminUsername = $AdminUsername
                 adminPassword = $AdminPassword
-                osDiskSizeGb = $OsDiskSizeGb
-                osDiskType = $OsDiskType
+                osDiskSizeGB = $OSDiskSizeGB
+                osDiskType = $OSDiskType
             }
 
             $deployment = @{
