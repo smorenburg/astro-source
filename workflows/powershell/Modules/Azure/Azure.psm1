@@ -22,20 +22,23 @@ Import-Module -Name Az.Resources
 
 function Connect-Azure
 {
+    [CmdletBinding()]
     param(
-        [string]$SubscriptionId
+        [string] $SubscriptionId
     )
+    process
+    {
+        $federatedToken = Get-Content -Path $Env:AZURE_FEDERATED_TOKEN_FILE -Raw
 
-    $federatedToken = Get-Content -Path $Env:AZURE_FEDERATED_TOKEN_FILE -Raw
+        $account = @{
+            ApplicationId = $Env:AZURE_CLIENT_ID
+            TenantId = $Env:AZURE_TENANT_ID
+            SubscriptionId = $SubscriptionId
+            FederatedToken = $federatedToken
+        }
 
-    $account = @{
-        ApplicationId = $Env:AZURE_CLIENT_ID
-        TenantId = $Env:AZURE_TENANT_ID
-        SubscriptionId = $SubscriptionId
-        FederatedToken = $federatedToken
+        Connect-AzAccount @account -WarningAction:SilentlyContinue | Out-Null
     }
-
-    Connect-AzAccount @account -WarningAction:SilentlyContinue | Out-Null
 }
 
 <#
@@ -72,35 +75,37 @@ function New-RandomString
 {
     [CmdletBinding(SupportsShouldProcess)]
     param(
-        [int]$Characters,
-        [switch]$Lowercase,
-        [switch]$Uppercase,
-        [switch]$Numeric,
-        [switch]$Special
+        [int]    $Characters,
+        [switch] $Lowercase,
+        [switch] $Uppercase,
+        [switch] $Numeric,
+        [switch] $Special
     )
-
-    $string = $empty
-
-    if ($Lowercase)
+    process
     {
-        $string += "abcdefghijklmnopqrstuwvxyz"
-    }
-    if ($Uppercase)
-    {
-        $string += "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    }
-    if ($Numeric)
-    {
-        $string += "0123456789"
-    }
-    if ($Special)
-    {
-        $string += "~`! @#$%^&*()_-+={[}]|\:;`"'<,>.?/"
-    }
+        $string = $empty
 
-    $randomString = -Join ($string.ToCharArray() | Get-Random -Count $Characters | ForEach-Object { [char]$PSItem })
+        if ($Lowercase)
+        {
+            $string += "abcdefghijklmnopqrstuwvxyz"
+        }
+        if ($Uppercase)
+        {
+            $string += "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        }
+        if ($Numeric)
+        {
+            $string += "0123456789"
+        }
+        if ($Special)
+        {
+            $string += "~`! @#$%^&*()_-+={[}]|\:;`"'<,>.?/"
+        }
 
-    return $randomString
+        $randomString = -Join ($string.ToCharArray() | Get-Random -Count $Characters | ForEach-Object { [char]$PSItem })
+
+        return $randomString
+    }
 }
 
 <#
@@ -141,35 +146,37 @@ function New-ResourceGroup
 {
     [CmdletBinding(SupportsShouldProcess)]
     param(
-        [string]$Location,
-        [string]$ResourceGroupName,
-        [switch]$ConnectAzure,
-        [string]$SubscriptionId
+        [string] $Location,
+        [string] $ResourceGroupName,
+        [switch] $ConnectAzure,
+        [string] $SubscriptionId
     )
-
-    try
+    process
     {
-        if ($ConnectAzure)
+        try
         {
-            Connect-Azure -SubscriptionId $SubscriptionId
-        }
+            if ($ConnectAzure)
+            {
+                Connect-Azure -SubscriptionId $SubscriptionId
+            }
 
-        Get-AzResourceGroup -Name $ResourceGroupName -ErrorVariable absent -ErrorAction SilentlyContinue | Out-Null
+            Get-AzResourceGroup -Name $ResourceGroupName -ErrorVariable absent -ErrorAction SilentlyContinue | Out-Null
 
-        if ($absent)
-        {
-            New-AzResourceGroup -Name $ResourceGroupName -Location $Location
+            if ($absent)
+            {
+                New-AzResourceGroup -Name $ResourceGroupName -Location $Location
+            }
+            else
+            {
+                Write-Output -InputObject "Error: Resource group $ResourceGroupName already exists."
+                exit 1
+            }
         }
-        else
+        catch
         {
-            Write-Output -InputObject "Error: Resource group $ResourceGroupName already exists."
+            Write-Output -InputObject $PSItem
             exit 1
         }
-    }
-    catch
-    {
-        Write-Output -InputObject $PSItem
-        exit 1
     }
 }
 
@@ -224,42 +231,44 @@ function New-StorageAccount
 {
     [CmdletBinding(SupportsShouldProcess)]
     param(
-        [string]$Location,
-        [string]$ResourceGroupName,
-        [bool]$NewResourceGroup,
-        [string]$StorageAccountPrefix,
-        [string]$StorageAccountSku,
-        [switch]$ConnectAzure,
-        [string]$SubscriptionId
+        [string] $Location,
+        [string] $ResourceGroupName,
+        [bool]   $NewResourceGroup,
+        [string] $StorageAccountPrefix,
+        [string] $StorageAccountSku,
+        [switch] $ConnectAzure,
+        [string] $SubscriptionId
     )
-
-    try
+    process
     {
-        if ($ConnectAzure)
+        try
         {
-            Connect-Azure -SubscriptionId $SubscriptionId
-        }
+            if ($ConnectAzure)
+            {
+                Connect-Azure -SubscriptionId $SubscriptionId
+            }
 
-        if ($NewResourceGroup)
+            if ($NewResourceGroup)
+            {
+                New-ResourceGroup -Location $Location -ResourceGroupName $ResourceGroupName
+            }
+
+            $randomString = New-RandomString -Characters 6 -Lowercase -Numeric
+
+            $deployment = @{
+                ResourceGroupName = $ResourceGroupName
+                TemplateFile = "Templates/storageAccount.bicep"
+                storageAccountName = $StorageAccountPrefix + $randomString
+                storageAccountSku = $StorageAccountSku
+            }
+
+            New-AzResourceGroupDeployment @deployment -WarningAction:SilentlyContinue
+        }
+        catch
         {
-            New-ResourceGroup -Location $Location -ResourceGroupName $ResourceGroupName
+            Write-Output -InputObject $PSItem
+            exit 1
         }
-
-        $randomString = New-RandomString -Characters 6 -Lowercase -Numeric
-
-        $deployment = @{
-            ResourceGroupName = $ResourceGroupName
-            TemplateFile = "Templates/storageAccount.bicep"
-            storageAccountName = $StorageAccountPrefix + $randomString
-            storageAccountSku = $StorageAccountSku
-        }
-
-        New-AzResourceGroupDeployment @deployment -WarningAction:SilentlyContinue
-    }
-    catch
-    {
-        Write-Output -InputObject $PSItem
-        exit 1
     }
 }
 
