@@ -164,7 +164,7 @@ function New-ResourceGroup
 
             if ($absent)
             {
-                New-AzResourceGroup -Name $ResourceGroupName -Location $Location
+                New-AzResourceGroup -Name $ResourceGroupName -Location $Location -Verbose
             }
             else
             {
@@ -247,7 +247,6 @@ function New-StorageAccount
             {
                 Connect-Azure -SubscriptionId $SubscriptionId
             }
-
             if ($NewResourceGroup)
             {
                 New-ResourceGroup -Location $Location -ResourceGroupName $ResourceGroupName
@@ -255,14 +254,19 @@ function New-StorageAccount
 
             $randomString = New-RandomString -Characters 6 -Lowercase -Numeric
 
-            $deployment = @{
-                ResourceGroupName = $ResourceGroupName
-                TemplateFile = "Templates/storageAccount.bicep"
+            $template = @{
                 storageAccountName = $StorageAccountPrefix + $randomString
                 storageAccountSku = $StorageAccountSku
             }
 
-            New-AzResourceGroupDeployment @deployment -WarningAction:SilentlyContinue
+            $deployment = @{
+                DeploymentName = New-RandomString -Characters 24 -Lowercase -Numeric
+                ResourceGroupName = $ResourceGroupName
+                TemplateFile = "Templates/storageAccount.bicep"
+                TemplateParameterObject = $template
+            }
+
+            New-AzResourceGroupDeployment @deployment -WarningAction:SilentlyContinue -Verbose
         }
         catch
         {
@@ -273,3 +277,134 @@ function New-StorageAccount
 }
 
 Export-ModuleMember -Function New-StorageAccount
+
+function New-VirtualNetwork
+{
+    [CmdletBinding(SupportsShouldProcess)]
+    param(
+        [string] $Location,
+        [string] $ResourceGroupName,
+        [bool]   $NewResourceGroup,
+        [string] $VirtualNetworkName,
+        [string] $VirtualNetworkAddressPrefix,
+        [string] $SubnetName,
+        [string] $SubnetAddressPrefix,
+        [switch] $ConnectAzure,
+        [string] $SubscriptionId
+    )
+    process
+    {
+        try
+        {
+            if ($ConnectAzure)
+            {
+                Connect-Azure -SubscriptionId $SubscriptionId
+            }
+            if ($NewResourceGroup)
+            {
+                New-ResourceGroup -Location $Location -ResourceGroupName $ResourceGroupName
+            }
+
+            $template = @{
+                virtualNetworkName = $VirtualNetworkName
+                virtualNetworkAddressPrefix = $VirtualNetworkAddressPrefix
+                subnetName = $SubnetName
+                subnetAddressPrefix = $SubnetAddressPrefix
+            }
+
+            $deployment = @{
+                DeploymentName = New-RandomString -Characters 24 -Lowercase -Numeric
+                ResourceGroupName = $ResourceGroupName
+                TemplateFile = "Templates/virtualNetwork.bicep"
+                TemplateParameterObject = $template
+            }
+
+            New-AzResourceGroupDeployment @deployment -WarningAction:SilentlyContinue -Verbose
+        }
+        catch
+        {
+            Write-Output -InputObject $PSItem
+            exit 1
+        }
+    }
+}
+
+Export-ModuleMember -Function New-VirtualNetwork
+
+function New-VirtualMachine
+{
+    [CmdletBinding(SupportsShouldProcess)]
+    param(
+        [string] $Location,
+        [string] $ResourceGroupName,
+        [bool]   $NewResourceGroup,
+        [string] $VirtualNetworkResourceGroupName,
+        [string] $VirtualNetworkName,
+        [string] $SubnetName,
+        [string] $VirtualMachineName,
+        [string] $AvailabilityZone,
+        [string] $VirtualMachineSize,
+        [string] $Hostname,
+        [string] $Image,
+        [string] $AdminUsername,
+        [string] $AdminPassword,
+        [int]    $OsDiskSizeGb,
+        [string] $OsDiskType,
+        [switch] $ConnectAzure,
+        [string] $SubscriptionId
+    )
+    process
+    {
+        try
+        {
+            if ($ConnectAzure)
+            {
+                Connect-Azure -SubscriptionId $SubscriptionId
+            }
+            if ($NewResourceGroup)
+            {
+                New-ResourceGroup -Location $Location -ResourceGroupName $ResourceGroupName
+            }
+            if ($Image -eq "Ubuntu")
+            {
+                $imageReference = @{
+                    publisher = "canonical"
+                    offer = "0001-com-ubuntu-server-jammy'"
+                    sku = "22_04-lts-gen2"
+                    version = "latest"
+                }
+            }
+
+            $template = @{
+                virtualNetworkResourceGroupName = $VirtualNetworkResourceGroupName
+                virtualNetworkName = $VirtualNetworkName
+                subnetName = $SubnetName
+                virtualMachineName = $VirtualMachineName
+                availabilityZone = $AvailabilityZone
+                virtualMachineSize = $VirtualMachineSize
+                hostname = $Hostname
+                image = $imageReference
+                adminUsername = $AdminUsername
+                adminPassword = $AdminPassword
+                osDiskSizeGb = $OsDiskSizeGb
+                osDiskType = $OsDiskType
+            }
+
+            $deployment = @{
+                DeploymentName = New-RandomString -Characters 24 -Lowercase -Numeric
+                ResourceGroupName = $ResourceGroupName
+                TemplateFile = "Templates/virtualMachine.bicep"
+                TemplateParameterObject = $template
+            }
+
+            New-AzResourceGroupDeployment @deployment -WarningAction:SilentlyContinue -Verbose
+        }
+        catch
+        {
+            Write-Output -InputObject $PSItem
+            exit 1
+        }
+    }
+}
+
+Export-ModuleMember -Function New-VirtualMachine
