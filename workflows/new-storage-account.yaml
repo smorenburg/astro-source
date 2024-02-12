@@ -43,11 +43,11 @@ spec:
         args: [
           "-Command",
           "New-StorageAccount",
+          "-ConnectAzure",
           "-SubscriptionId {{inputs.parameters.subscription-id}}",
-          "-Location {{inputs.parameters.location}}",
           "-ResourceGroupName {{inputs.parameters.resource-group-name}}",
           "-NewResourceGroup {{inputs.parameters.new-resource-group}}",
+          "-Location {{inputs.parameters.location}}",
           "-StorageAccountPrefix {{inputs.parameters.storage-account-prefix}}",
-          "-StorageAccountSku {{inputs.parameters.storage-account-sku}}",
-          "-ConnectAzure"
+          "-StorageAccountSku {{inputs.parameters.storage-account-sku}}"
         ]

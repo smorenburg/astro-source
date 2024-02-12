@@ -146,10 +146,10 @@ function New-ResourceGroup
 {
     [CmdletBinding(SupportsShouldProcess)]
     param(
-        [string] $Location,
-        [string] $ResourceGroupName,
         [switch] $ConnectAzure,
-        [string] $SubscriptionId
+        [string] $SubscriptionId,
+        [string] $ResourceGroupName,
+        [string] $Location
     )
     process
     {
@@ -164,7 +164,7 @@ function New-ResourceGroup
 
             if ($absent)
             {
-                New-AzResourceGroup -Name $ResourceGroupName -Location $Location -Verbose
+                New-AzResourceGroup -Name $ResourceGroupName -Location $Location -Tag @{ Provisioner = "SuperMaestro"; Purpose = "Testing"; ResourceOwner = "***REMOVED***" } -Verbose
             }
             else
             {
@@ -231,13 +231,13 @@ function New-StorageAccount
 {
     [CmdletBinding(SupportsShouldProcess)]
     param(
-        [string] $Location,
+        [switch] $ConnectAzure,
+        [string] $SubscriptionId,
         [string] $ResourceGroupName,
         [bool]   $NewResourceGroup,
+        [string] $Location,
         [string] $StorageAccountPrefix,
-        [string] $StorageAccountSku,
-        [switch] $ConnectAzure,
-        [string] $SubscriptionId
+        [string] $StorageAccountSku
     )
     process
     {
@@ -282,15 +282,15 @@ function New-VirtualNetwork
 {
     [CmdletBinding(SupportsShouldProcess)]
     param(
-        [string] $Location,
+        [switch] $ConnectAzure,
+        [string] $SubscriptionId,
         [string] $ResourceGroupName,
         [bool]   $NewResourceGroup,
+        [string] $Location,
         [string] $VirtualNetworkName,
         [string] $VirtualNetworkAddressPrefix,
         [string] $SubnetName,
-        [string] $SubnetAddressPrefix,
-        [switch] $ConnectAzure,
-        [string] $SubscriptionId
+        [string] $SubnetAddressPrefix
     )
     process
     {
@@ -335,9 +335,11 @@ function New-VirtualMachine
 {
     [CmdletBinding(SupportsShouldProcess)]
     param(
-        [string] $Location,
+        [switch] $ConnectAzure,
+        [string] $SubscriptionId,
         [string] $ResourceGroupName,
         [bool]   $NewResourceGroup,
+        [string] $Location,
         [string] $VirtualNetworkResourceGroupName,
         [string] $VirtualNetworkName,
         [string] $SubnetName,
@@ -345,13 +347,14 @@ function New-VirtualMachine
         [string] $AvailabilityZone,
         [string] $VirtualMachineSize,
         [string] $Hostname,
+
+        [ValidateSet("Ubuntu")]
         [string] $Image,
+
         [string] $AdminUsername,
         [string] $AdminPassword,
         [int]    $OsDiskSizeGb,
-        [string] $OsDiskType,
-        [switch] $ConnectAzure,
-        [string] $SubscriptionId
+        [string] $OsDiskType
     )
     process
     {
@@ -369,7 +372,7 @@ function New-VirtualMachine
             {
                 $imageReference = @{
                     publisher = "canonical"
-                    offer = "0001-com-ubuntu-server-jammy'"
+                    offer = "0001-com-ubuntu-server-jammy"
                     sku = "22_04-lts-gen2"
                     version = "latest"
                 }

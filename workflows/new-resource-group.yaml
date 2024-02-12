@@ -31,8 +31,8 @@ spec:
         args: [
           "-Command",
           "New-ResourceGroup",
+          "-ConnectAzure",
           "-SubscriptionId {{inputs.parameters.subscription-id}}",
-          "-Location {{inputs.parameters.location}}",
           "-ResourceGroupName {{inputs.parameters.resource-group-name}}",
-          "-ConnectAzure"
+          "-Location {{inputs.parameters.location}}"
         ]
