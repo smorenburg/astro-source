@@ -426,6 +426,19 @@ function New-VirtualMachine
                 New-ResourceGroup -Location $Location -ResourceGroupName $ResourceGroupName
             }
 
+            switch ($Location)
+            {
+                "northeurope" {
+                    $locationAbbreviation = "neu"; break
+                }
+                "westeurope" {
+                    $locationAbbreviation = "weu"; break
+                }
+                default {
+                    $locationAbbreviation = "na"; break
+                }
+            }
+
             if ($Image -eq "Ubuntu")
             {
                 $imageReference = @{
@@ -435,7 +448,7 @@ function New-VirtualMachine
                     version = "latest"
                 }
                 $osDiskSizeGB = 32
-                $virtualMachinePrefix = "azneulx"
+                $virtualMachinePrefix = "az${locationAbbreviation}lx"
             }
 
             $randomString = New-RandomString -Characters 4 -Numeric
