@@ -15,11 +15,6 @@ spec:
         value: northeurope
       - name: resource-group-name
         value: rg-argo
-      - name: new-resource-group
-        value: $False
-        enum:
-          - $True
-          - $False
       - name: key-vault-name-prefix
         value: kv-argo-
   templates:
@@ -42,7 +37,6 @@ spec:
           "New-KeyVault",
           "-ConnectAzure",
           "-SubscriptionId {{inputs.parameters.subscription-id}}",
-          "-ResourceGroupName {{inputs.parameters.resource-group-name}}",
           "-NewResourceGroup {{inputs.parameters.new-resource-group}}",
           "-Location {{inputs.parameters.location}}",
           "-KeyVaultNamePrefix {{inputs.parameters.key-vault-name-prefix}}"

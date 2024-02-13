@@ -15,11 +15,6 @@ spec:
         value: northeurope
       - name: resource-group-name
         value: rg-argo
-      - name: new-resource-group
-        value: $True
-        enum:
-          - $True
-          - $False
       - name: storage-account-name-prefix
         value: saargo
       - name: storage-account-sku
@@ -31,7 +26,6 @@ spec:
           - name: subscription-id
           - name: location
           - name: resource-group-name
-          - name: new-resource-group
           - name: storage-account-name-prefix
           - name: storage-account-sku
       metadata:
@@ -46,7 +40,6 @@ spec:
           "-ConnectAzure",
           "-SubscriptionId {{inputs.parameters.subscription-id}}",
           "-ResourceGroupName {{inputs.parameters.resource-group-name}}",
-          "-NewResourceGroup {{inputs.parameters.new-resource-group}}",
           "-Location {{inputs.parameters.location}}",
           "-StorageAccountNamePrefix {{inputs.parameters.storage-account-name-prefix}}",
           "-StorageAccountSku {{inputs.parameters.storage-account-sku}}"

@@ -15,11 +15,6 @@ spec:
         value: northeurope
       - name: resource-group-name
         value: rg-argo
-      - name: new-resource-group
-        value: $True
-        enum:
-          - $True
-          - $False
       - name: virtual-network-resource-group-name
         value: rg-argo-neu
       - name: virtual-network-name
@@ -46,7 +41,6 @@ spec:
           - name: subscription-id
           - name: location
           - name: resource-group-name
-          - name: new-resource-group
           - name: virtual-network-resource-group-name
           - name: virtual-network-name
           - name: subnet-name
@@ -67,7 +61,6 @@ spec:
           "-ConnectAzure",
           "-SubscriptionId {{inputs.parameters.subscription-id}}",
           "-ResourceGroupName {{inputs.parameters.resource-group-name}}",
-          "-NewResourceGroup {{inputs.parameters.new-resource-group}}",
           "-Location {{inputs.parameters.location}}",
           "-VirtualNetworkResourceGroupName {{inputs.parameters.virtual-network-resource-group-name}}",
           "-VirtualNetworkName {{inputs.parameters.virtual-network-name}}",

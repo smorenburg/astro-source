@@ -89,14 +89,17 @@ function New-RandomString
         {
             $string += "abcdefghijklmnopqrstuwvxyz"
         }
+
         if ($Uppercase)
         {
             $string += "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         }
+
         if ($Numeric)
         {
             $string += "0123456789"
         }
+
         if ($Special)
         {
             $string += "~`! @#$%^&*()_-+={[}]|\:;`"'<,>.?/"
@@ -164,7 +167,7 @@ function New-ResourceGroup
 
             if ($absent)
             {
-                New-AzResourceGroup -Name $ResourceGroupName -Location $Location -Verbose
+                New-AzResourceGroup -Name $ResourceGroupName -Location $Location -Tag @{ Provisioner = "SuperMaestro"; Purpose = "Testing"; ResourceOwner = "***REMOVED***" } -Verbose
             }
             else
             {
@@ -233,7 +236,6 @@ function New-StorageAccount
         [switch]$ConnectAzure,
         [string]$SubscriptionId,
         [string]$ResourceGroupName,
-        [bool]$NewResourceGroup,
         [string]$Location,
         [string]$StorageAccountNamePrefix,
         [string]$StorageAccountSku
@@ -245,10 +247,6 @@ function New-StorageAccount
             if ($ConnectAzure)
             {
                 Connect-Azure -SubscriptionId $SubscriptionId
-            }
-            if ($NewResourceGroup)
-            {
-                New-ResourceGroup -Location $Location -ResourceGroupName $ResourceGroupName
             }
 
             $randomString = New-RandomString -Characters 6 -Lowercase -Numeric
@@ -284,7 +282,6 @@ function New-KeyVault
         [switch]$ConnectAzure,
         [string]$SubscriptionId,
         [string]$ResourceGroupName,
-        [bool]$NewResourceGroup,
         [string]$Location,
         [string]$KeyVaultPrefix,
         [string]$KeyVaultName,
@@ -297,11 +294,6 @@ function New-KeyVault
             if ($ConnectAzure)
             {
                 Connect-Azure -SubscriptionId $SubscriptionId
-            }
-
-            if ($NewResourceGroup)
-            {
-                New-ResourceGroup -Location $Location -ResourceGroupName $ResourceGroupName
             }
 
             if ($KeyVaultPrefix)
@@ -347,7 +339,6 @@ function New-VirtualNetwork
         [switch]$ConnectAzure,
         [string]$SubscriptionId,
         [string]$ResourceGroupName,
-        [bool]$NewResourceGroup,
         [string]$Location,
         [string]$VirtualNetworkName,
         [string]$VirtualNetworkAddressPrefix,
@@ -361,10 +352,6 @@ function New-VirtualNetwork
             if ($ConnectAzure)
             {
                 Connect-Azure -SubscriptionId $SubscriptionId
-            }
-            if ($NewResourceGroup)
-            {
-                New-ResourceGroup -Location $Location -ResourceGroupName $ResourceGroupName
             }
 
             $template = @{
@@ -393,6 +380,48 @@ function New-VirtualNetwork
 
 Export-ModuleMember -Function New-VirtualNetwork
 
+function New-RecoveryServicesVault
+{
+    [CmdletBinding(SupportsShouldProcess)]
+    param(
+        [switch]$ConnectAzure,
+        [string]$SubscriptionId,
+        [string]$ResourceGroupName,
+        [string]$Location,
+        [string]$RecoveryServicesVaultName
+    )
+    process
+    {
+        try
+        {
+            if ($ConnectAzure)
+            {
+                Connect-Azure -SubscriptionId $SubscriptionId
+            }
+
+            $template = @{
+                recoveryServicesVaultName = $RecoveryServicesVaultName
+            }
+
+            $deployment = @{
+                DeploymentName = New-RandomString -Characters 24 -Lowercase -Numeric
+                ResourceGroupName = $ResourceGroupName
+                TemplateFile = "Templates/recoveryServicesVault.bicep"
+                TemplateParameterObject = $template
+            }
+
+            New-AzResourceGroupDeployment @deployment -WarningAction:SilentlyContinue -Verbose
+        }
+        catch
+        {
+            Write-Output -InputObject $PSItem
+            exit 1
+        }
+    }
+}
+
+Export-ModuleMember -Function New-RecoveryServicesVault
+
 function New-VirtualMachine
 {
     [CmdletBinding(SupportsShouldProcess)]
@@ -400,7 +429,6 @@ function New-VirtualMachine
         [switch]$ConnectAzure,
         [string]$SubscriptionId,
         [string]$ResourceGroupName,
-        [bool]$NewResourceGroup,
         [string]$Location,
         [string]$VirtualNetworkResourceGroupName,
         [string]$VirtualNetworkName,
@@ -419,11 +447,6 @@ function New-VirtualMachine
             if ($ConnectAzure)
             {
                 Connect-Azure -SubscriptionId $SubscriptionId
-            }
-
-            if ($NewResourceGroup)
-            {
-                New-ResourceGroup -Location $Location -ResourceGroupName $ResourceGroupName
             }
 
             switch ($Location)
@@ -475,8 +498,8 @@ function New-VirtualMachine
             $adminPassword = New-RandomString -Characters 16 -Lowercase -Uppercase -Numeric -Special
             [securestring]$AdminPasswordSecure = ConvertTo-SecureString -String $adminPassword -AsPlainText -Force
 
-            Set-AzKeyVaultSecret -VaultName $KeyVaultName -Name "$VirtualMachineName-username" -SecretValue $adminUsernameSecure
-            Set-AzKeyVaultSecret -VaultName $KeyVaultName -Name "$VirtualMachineName-password" -SecretValue $adminPasswordSecure
+            Set-AzKeyVaultSecret -VaultName $KeyVaultName -Name "${VirtualMachineName}-username" -SecretValue $adminUsernameSecure
+            Set-AzKeyVaultSecret -VaultName $KeyVaultName -Name "${VirtualMachineName}-password" -SecretValue $adminPasswordSecure
 
             $template = @{
                 virtualNetworkResourceGroupName = $VirtualNetworkResourceGroupName
