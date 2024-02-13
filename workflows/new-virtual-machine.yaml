@@ -27,23 +27,18 @@ spec:
       - name: subnet-name
         value: default
       - name: key-vault-name
-        value: kv-argo-rp2tgi
-      - name: virtual-machine-name
-        value: vm-argo-neu-001
-      - name: availability-zone
-        value: "1"
+        value: kv-
+      - name: new-key-vault
+        value: $True
+        enum:
+          - $True
+          - $False
+      - name: object-id
+        value: de98da92-5d05-4bde-b437-efa11721943a
       - name: virtual-machine-size
         value: Standard_B2s
-      - name: hostname
-        value: vm-001
       - name: image
         value: Ubuntu
-      - name: admin-username
-        value: redbird
-      - name: os-disk-size-gb
-        value: 32
-      - name: os-disk-type
-        value: Premium_LRS
   templates:
     - name: new-virtual-machine
       inputs:
@@ -56,14 +51,10 @@ spec:
           - name: virtual-network-name
           - name: subnet-name
           - name: key-vault-name
-          - name: virtual-machine-name
-          - name: availability-zone
+          - name: object-id
+          - name: new-key-vault
           - name: virtual-machine-size
-          - name: hostname
           - name: image
-          - name: admin-username
-          - name: os-disk-size-gb
-          - name: os-disk-type
       metadata:
         labels:
           azure.workload.identity/use: "true"
@@ -82,12 +73,8 @@ spec:
           "-VirtualNetworkName {{inputs.parameters.virtual-network-name}}",
           "-SubnetName {{inputs.parameters.subnet-name}}",
           "-KeyVaultName {{inputs.parameters.key-vault-name}}",
-          "-VirtualMachineName {{inputs.parameters.virtual-machine-name}}",
-          "-AvailabilityZone {{inputs.parameters.availability-zone}}",
+          "-ObjectId {{inputs.parameters.object-id}}",
+          "-NewKeyVault {{inputs.parameters.new-key-vault}}",
           "-VirtualMachineSize {{inputs.parameters.virtual-machine-size}}",
-          "-Hostname {{inputs.parameters.hostname}}",
-          "-Image {{inputs.parameters.image}}",
-          "-AdminUsername {{inputs.parameters.admin-username}}",
-          "-OSDiskSizeGB {{inputs.parameters.os-disk-size-gb}}",
-          "-OSDiskType {{inputs.parameters.os-disk-type}}"
+          "-Image {{inputs.parameters.image}}"
         ]

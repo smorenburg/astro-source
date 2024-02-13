@@ -2,12 +2,10 @@ param virtualNetworkResourceGroupName string
 param virtualNetworkName string
 param subnetName string
 param virtualMachineName string
-param availabilityZone string
 param virtualMachineSize string
-param hostname string
 param image object
-param osDiskSizeGb int
-param osDiskType string
+param osDiskSizeGB int
+param osDiskType string = 'Premium_LRS'
 
 param adminUsername string
 
@@ -50,29 +48,21 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2020-12-01' = {
   identity: {
      type: 'SystemAssigned'
   }
-  zones: [
-    availabilityZone
-  ]
   properties: {
     hardwareProfile: {
       vmSize: virtualMachineSize
     }
     osProfile: {
-     computerName: hostname
+     computerName: toUpper(virtualMachineName)
      adminUsername: adminUsername
      adminPassword: adminPassword
     }
     storageProfile: {
-      imageReference: {
-        publisher: 'canonical'
-        offer: '0001-com-ubuntu-server-jammy'
-        sku: '22_04-lts-gen2'
-        version: 'latest'
-      }
+      imageReference: image
       osDisk: {
         name: 'osdisk-${virtualMachineName}'
         osType: 'Linux'
-        diskSizeGB: osDiskSizeGb
+        diskSizeGB: osDiskSizeGB
         createOption: 'FromImage'
         caching: 'ReadWrite'
         managedDisk: {

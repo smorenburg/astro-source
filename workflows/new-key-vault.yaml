@@ -16,7 +16,7 @@ spec:
       - name: resource-group-name
         value: rg-argo
       - name: new-resource-group
-        value: $True
+        value: $False
         enum:
           - $True
           - $False

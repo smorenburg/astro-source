@@ -164,12 +164,11 @@ function New-ResourceGroup
 
             if ($absent)
             {
-                New-AzResourceGroup -Name $ResourceGroupName -Location $Location -Tag @{ Provisioner = "SuperMaestro"; Purpose = "Testing"; ResourceOwner = "***REMOVED***" } -Verbose
+                New-AzResourceGroup -Name $ResourceGroupName -Location $Location -Verbose
             }
             else
             {
-                Write-Output -InputObject "Error: Resource group $ResourceGroupName already exists."
-                exit 1
+                Write-Output -InputObject "Resource group $ResourceGroupName already exists."
             }
         }
         catch
@@ -287,7 +286,9 @@ function New-KeyVault
         [string]$ResourceGroupName,
         [bool]$NewResourceGroup,
         [string]$Location,
-        [string]$KeyVaultNamePrefix
+        [string]$KeyVaultPrefix,
+        [string]$KeyVaultName,
+        [string]$ObjectId
     )
     process
     {
@@ -296,23 +297,28 @@ function New-KeyVault
             if ($ConnectAzure)
             {
                 Connect-Azure -SubscriptionId $SubscriptionId
-                $objectId = (Get-AzADServicePrincipal -ApplicationId  0078758b-4315-4a50-a3f8-0260bcee916c).Id
+            }
 
-            }
-            else
-            {
-                $objectId = (Get-AzADUser -SignedIn).Id
-            }
             if ($NewResourceGroup)
             {
                 New-ResourceGroup -Location $Location -ResourceGroupName $ResourceGroupName
             }
 
-            $randomString = New-RandomString -Characters 6 -Lowercase -Numeric
+            if ($KeyVaultPrefix)
+            {
+                $randomString = New-RandomString -Characters 6 -Lowercase -Numeric
 
-            $template = @{
-                keyVaultName = $KeyVaultNamePrefix + $randomString
-                objectId = $objectId
+                $template = @{
+                    keyVaultName = $KeyVaultPrefix + $randomString
+                    objectId = $ObjectId
+                }
+            }
+            else
+            {
+                $template = @{
+                    keyVaultName = $KeyVaultName
+                    objectId = $ObjectId
+                }
             }
 
             $deployment = @{
@@ -400,18 +406,11 @@ function New-VirtualMachine
         [string]$VirtualNetworkName,
         [string]$SubnetName,
         [string]$KeyVaultName,
-        [string]$VirtualMachineName,
-        [ValidateSet("1", "2", "3")]
-        [string]$AvailabilityZone,
+        [bool]$NewKeyVault,
+        [string]$ObjectId,
         [string]$VirtualMachineSize,
-        [string]$Hostname,
         [ValidateSet("Ubuntu")]
-        [string]$Image,
-        [string]$AdminUsername,
-        [ValidateSet(4, 8, 16, 32, 64, 128, 256, 512, 1024)]
-        [int]$OSDiskSizeGB,
-        [ValidateSet("Standard_LRS", "StandardSSD_LRS", "StandardSSD_ZRS", "Premium_LRS", "Premium_ZRS")]
-        [string]$OSDiskType
+        [string]$Image
     )
     process
     {
@@ -421,10 +420,12 @@ function New-VirtualMachine
             {
                 Connect-Azure -SubscriptionId $SubscriptionId
             }
+
             if ($NewResourceGroup)
             {
                 New-ResourceGroup -Location $Location -ResourceGroupName $ResourceGroupName
             }
+
             if ($Image -eq "Ubuntu")
             {
                 $imageReference = @{
@@ -433,7 +434,32 @@ function New-VirtualMachine
                     sku = "22_04-lts-gen2"
                     version = "latest"
                 }
+                $osDiskSizeGB = 32
+                $virtualMachinePrefix = "azneulx"
             }
+
+            $randomString = New-RandomString -Characters 4 -Numeric
+            $virtualMachineName = $virtualMachinePrefix + $randomString
+
+            if ($NewKeyVault)
+            {
+                $KeyVaultName = "kv-$virtualMachineName"
+
+                $keyVault = @{
+                    SubscriptionId = $SubscriptionId
+                    Location = $Location
+                    ResourceGroupName = $ResourceGroupName
+                    KeyVaultName = $KeyVaultName
+                    ObjectId = $ObjectId # TODO: Find another way of geting the ObjectId of the workload identity.
+                }
+
+                New-KeyVault @keyVault
+            }
+
+            $adminUsername = New-RandomString -Characters 8 -Lowercase -Numeric
+            [securestring]$AdminUsernameSecure = ConvertTo-SecureString -String $adminUsername -AsPlainText -Force
+
+            Set-AzKeyVaultSecret -VaultName $KeyVaultName -Name "$VirtualMachineName-username" -SecretValue $adminUsernameSecure
 
             $adminPassword = New-RandomString -Characters 16 -Lowercase -Uppercase -Numeric -Special
             [securestring]$AdminPasswordSecure = ConvertTo-SecureString -String $adminPassword -AsPlainText -Force
@@ -444,15 +470,12 @@ function New-VirtualMachine
                 virtualNetworkResourceGroupName = $VirtualNetworkResourceGroupName
                 virtualNetworkName = $VirtualNetworkName
                 subnetName = $SubnetName
-                virtualMachineName = $VirtualMachineName
-                availabilityZone = $AvailabilityZone
-                virtualMachineSize = $VirtualMachineSize
-                hostname = $Hostname
-                image = $imageReference
-                adminUsername = $AdminUsername
-                adminPassword = $AdminPasswordSecure
-                osDiskSizeGB = $OSDiskSizeGB
-                osDiskType = $OSDiskType
+                virtualMachineName = $virtualMachineName
+                virtualMachineSize = $VirtualMachineSize # TODO: Limit to a handfull of D-series.
+                image = $imageReference # TODO: Dropdown with a couple of images.
+                adminUsername = $adminUsernameSecure
+                adminPassword = $adminPasswordSecure
+                osDiskSizeGB = $osDiskSizeGB
             }
 
             $deployment = @{
