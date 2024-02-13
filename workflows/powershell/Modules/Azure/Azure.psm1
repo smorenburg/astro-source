@@ -164,7 +164,7 @@ function New-ResourceGroup
 
             if ($absent)
             {
-                New-AzResourceGroup -Name $ResourceGroupName -Location $Location -Verbose
+                New-AzResourceGroup -Name $ResourceGroupName -Location $Location -Tag @{ Provisioner = "SuperMaestro"; Purpose = "Testing"; ResourceOwner = "***REMOVED***" } -Verbose
             }
             else
             {
@@ -236,7 +236,7 @@ function New-StorageAccount
         [string]$ResourceGroupName,
         [bool]$NewResourceGroup,
         [string]$Location,
-        [string]$StorageAccountPrefix,
+        [string]$StorageAccountNamePrefix,
         [string]$StorageAccountSku
     )
     process
@@ -255,7 +255,7 @@ function New-StorageAccount
             $randomString = New-RandomString -Characters 6 -Lowercase -Numeric
 
             $template = @{
-                storageAccountName = $StorageAccountPrefix + $randomString
+                storageAccountName = $StorageAccountNamePrefix + $randomString
                 storageAccountSku = $StorageAccountSku
             }
 
@@ -277,6 +277,62 @@ function New-StorageAccount
 }
 
 Export-ModuleMember -Function New-StorageAccount
+
+function New-KeyVault
+{
+    [CmdletBinding(SupportsShouldProcess)]
+    param(
+        [switch]$ConnectAzure,
+        [string]$SubscriptionId,
+        [string]$ResourceGroupName,
+        [bool]$NewResourceGroup,
+        [string]$Location,
+        [string]$KeyVaultNamePrefix
+    )
+    process
+    {
+        try
+        {
+            if ($ConnectAzure)
+            {
+                Connect-Azure -SubscriptionId $SubscriptionId
+                $objectId = (Get-AzADServicePrincipal -ApplicationId  0078758b-4315-4a50-a3f8-0260bcee916c).Id
+
+            }
+            else
+            {
+                $objectId = (Get-AzADUser -SignedIn).Id
+            }
+            if ($NewResourceGroup)
+            {
+                New-ResourceGroup -Location $Location -ResourceGroupName $ResourceGroupName
+            }
+
+            $randomString = New-RandomString -Characters 6 -Lowercase -Numeric
+
+            $template = @{
+                keyVaultName = $KeyVaultNamePrefix + $randomString
+                objectId = $objectId
+            }
+
+            $deployment = @{
+                DeploymentName = New-RandomString -Characters 24 -Lowercase -Numeric
+                ResourceGroupName = $ResourceGroupName
+                TemplateFile = "Templates/keyVault.bicep"
+                TemplateParameterObject = $template
+            }
+
+            New-AzResourceGroupDeployment @deployment -WarningAction:SilentlyContinue -Verbose
+        }
+        catch
+        {
+            Write-Output -InputObject $PSItem
+            exit 1
+        }
+    }
+}
+
+Export-ModuleMember -Function New-KeyVault
 
 function New-VirtualNetwork
 {
@@ -343,17 +399,18 @@ function New-VirtualMachine
         [string]$VirtualNetworkResourceGroupName,
         [string]$VirtualNetworkName,
         [string]$SubnetName,
+        [string]$KeyVaultName,
         [string]$VirtualMachineName,
+        [ValidateSet("1", "2", "3")]
         [string]$AvailabilityZone,
         [string]$VirtualMachineSize,
         [string]$Hostname,
-
         [ValidateSet("Ubuntu")]
         [string]$Image,
-
         [string]$AdminUsername,
-        [string]$AdminPassword,
+        [ValidateSet(4, 8, 16, 32, 64, 128, 256, 512, 1024)]
         [int]$OSDiskSizeGB,
+        [ValidateSet("Standard_LRS", "StandardSSD_LRS", "StandardSSD_ZRS", "Premium_LRS", "Premium_ZRS")]
         [string]$OSDiskType
     )
     process
@@ -378,6 +435,11 @@ function New-VirtualMachine
                 }
             }
 
+            $adminPassword = New-RandomString -Characters 16 -Lowercase -Uppercase -Numeric -Special
+            [securestring]$AdminPasswordSecure = ConvertTo-SecureString -String $adminPassword -AsPlainText -Force
+
+            Set-AzKeyVaultSecret -VaultName $KeyVaultName -Name "$VirtualMachineName-password" -SecretValue $adminPasswordSecure
+
             $template = @{
                 virtualNetworkResourceGroupName = $VirtualNetworkResourceGroupName
                 virtualNetworkName = $VirtualNetworkName
@@ -388,7 +450,7 @@ function New-VirtualMachine
                 hostname = $Hostname
                 image = $imageReference
                 adminUsername = $AdminUsername
-                adminPassword = $AdminPassword
+                adminPassword = $AdminPasswordSecure
                 osDiskSizeGB = $OSDiskSizeGB
                 osDiskType = $OSDiskType
             }

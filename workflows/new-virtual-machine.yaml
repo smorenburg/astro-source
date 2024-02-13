@@ -1,0 +1,93 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: new-virtual-machine
+  namespace: argo
+spec:
+  entrypoint: new-virtual-machine
+  serviceAccountName: argo-workflow
+  arguments:
+    parameters:
+      - name: subscription-id
+        value: ae9db8ac-2682-4a98-ad36-7d13b2bd5a24
+      - name: location
+        value: northeurope
+      - name: resource-group-name
+        value: rg-argo
+      - name: new-resource-group
+        value: $True
+        enum:
+          - $True
+          - $False
+      - name: virtual-network-resource-group-name
+        value: rg-argo-neu
+      - name: virtual-network-name
+        value: vnet-argo-neu
+      - name: subnet-name
+        value: default
+      - name: key-vault-name
+        value: kv-argo-rp2tgi
+      - name: virtual-machine-name
+        value: vm-argo-neu-001
+      - name: availability-zone
+        value: "1"
+      - name: virtual-machine-size
+        value: Standard_B2s
+      - name: hostname
+        value: vm-001
+      - name: image
+        value: Ubuntu
+      - name: admin-username
+        value: redbird
+      - name: os-disk-size-gb
+        value: 32
+      - name: os-disk-type
+        value: Premium_LRS
+  templates:
+    - name: new-virtual-machine
+      inputs:
+        parameters:
+          - name: subscription-id
+          - name: location
+          - name: resource-group-name
+          - name: new-resource-group
+          - name: virtual-network-resource-group-name
+          - name: virtual-network-name
+          - name: subnet-name
+          - name: key-vault-name
+          - name: virtual-machine-name
+          - name: availability-zone
+          - name: virtual-machine-size
+          - name: hostname
+          - name: image
+          - name: admin-username
+          - name: os-disk-size-gb
+          - name: os-disk-type
+      metadata:
+        labels:
+          azure.workload.identity/use: "true"
+      container:
+        image: smorenburg/powershell
+        command: [ "pwsh" ]
+        args: [
+          "-Command",
+          "New-VirtualMachine",
+          "-ConnectAzure",
+          "-SubscriptionId {{inputs.parameters.subscription-id}}",
+          "-ResourceGroupName {{inputs.parameters.resource-group-name}}",
+          "-NewResourceGroup {{inputs.parameters.new-resource-group}}",
+          "-Location {{inputs.parameters.location}}",
+          "-VirtualNetworkResourceGroupName {{inputs.parameters.virtual-network-resource-group-name}}",
+          "-VirtualNetworkName {{inputs.parameters.virtual-network-name}}",
+          "-SubnetName {{inputs.parameters.subnet-name}}",
+          "-KeyVaultName {{inputs.parameters.key-vault-name}}",
+          "-VirtualMachineName {{inputs.parameters.virtual-machine-name}}",
+          "-AvailabilityZone {{inputs.parameters.availability-zone}}",
+          "-VirtualMachineSize {{inputs.parameters.virtual-machine-size}}",
+          "-Hostname {{inputs.parameters.hostname}}",
+          "-Image {{inputs.parameters.image}}",
+          "-AdminUsername {{inputs.parameters.admin-username}}",
+          "-OSDiskSizeGB {{inputs.parameters.os-disk-size-gb}}",
+          "-OSDiskType {{inputs.parameters.os-disk-type}}"
+        ]
