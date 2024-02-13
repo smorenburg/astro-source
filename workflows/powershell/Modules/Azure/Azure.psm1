@@ -459,11 +459,10 @@ function New-VirtualMachine
             $adminUsername = New-RandomString -Characters 8 -Lowercase -Numeric
             [securestring]$AdminUsernameSecure = ConvertTo-SecureString -String $adminUsername -AsPlainText -Force
 
-            Set-AzKeyVaultSecret -VaultName $KeyVaultName -Name "$VirtualMachineName-username" -SecretValue $adminUsernameSecure
-
             $adminPassword = New-RandomString -Characters 16 -Lowercase -Uppercase -Numeric -Special
             [securestring]$AdminPasswordSecure = ConvertTo-SecureString -String $adminPassword -AsPlainText -Force
 
+            Set-AzKeyVaultSecret -VaultName $KeyVaultName -Name "$VirtualMachineName-username" -SecretValue $adminUsernameSecure
             Set-AzKeyVaultSecret -VaultName $KeyVaultName -Name "$VirtualMachineName-password" -SecretValue $adminPasswordSecure
 
             $template = @{
