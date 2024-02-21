@@ -16,7 +16,7 @@ spec:
       - name: resource-group-name
         value: rg-argo
       - name: storage-account-name-prefix
-        value: saargo
+        value: stargo
       - name: storage-account-sku
         value: Standard_LRS
   templates:
