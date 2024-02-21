@@ -7,9 +7,9 @@ RUN wget -O bicep https://github.com/Azure/bicep/releases/latest/download/bicep-
 RUN chmod +x ./bicep
 RUN mv ./bicep /usr/local/bin/bicep
 
-ENV PSModulePath="$PSModulePath:/Modules"
+ENV PSModulePath="$PSModulePath:/powershell"
 
-COPY /Modules /Modules
-COPY /Templates /Templates
+COPY /powershell /powershell
+COPY /bicep /bicep
 
-CMD [ "pwsh", "-Command", "$PSVersionTable" ]
+CMD ["pwsh", "-Command", "$PSVersionTable"]
