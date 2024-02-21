@@ -31,13 +31,14 @@ spec:
           azure.workload.identity/use: "true"
       container:
         image: smorenburg/powershell
-        command: [ "pwsh" ]
-        args: [
-          "-Command",
-          "New-KeyVault",
-          "-ConnectAzure",
-          "-SubscriptionId {{inputs.parameters.subscription-id}}",
-          "-NewResourceGroup {{inputs.parameters.new-resource-group}}",
-          "-Location {{inputs.parameters.location}}",
-          "-KeyVaultNamePrefix {{inputs.parameters.key-vault-name-prefix}}"
-        ]
+        command: ["pwsh"]
+        args:
+          [
+            "-Command",
+            "New-KeyVault",
+            "-ConnectAzure",
+            "-SubscriptionId {{inputs.parameters.subscription-id}}",
+            "-NewResourceGroup {{inputs.parameters.new-resource-group}}",
+            "-Location {{inputs.parameters.location}}",
+            "-KeyVaultNamePrefix {{inputs.parameters.key-vault-name-prefix}}",
+          ]

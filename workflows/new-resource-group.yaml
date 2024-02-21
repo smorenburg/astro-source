@@ -27,12 +27,13 @@ spec:
           azure.workload.identity/use: "true"
       container:
         image: smorenburg/powershell
-        command: [ "pwsh" ]
-        args: [
-          "-Command",
-          "New-ResourceGroup",
-          "-ConnectAzure",
-          "-SubscriptionId {{inputs.parameters.subscription-id}}",
-          "-ResourceGroupName {{inputs.parameters.resource-group-name}}",
-          "-Location {{inputs.parameters.location}}"
-        ]
+        command: ["pwsh"]
+        args:
+          [
+            "-Command",
+            "New-ResourceGroup",
+            "-ConnectAzure",
+            "-SubscriptionId {{inputs.parameters.subscription-id}}",
+            "-ResourceGroupName {{inputs.parameters.resource-group-name}}",
+            "-Location {{inputs.parameters.location}}",
+          ]
