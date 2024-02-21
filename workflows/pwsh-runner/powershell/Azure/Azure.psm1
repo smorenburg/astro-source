@@ -167,7 +167,7 @@ function New-ResourceGroup
 
             if ($absent)
             {
-                New-AzResourceGroup -Name $ResourceGroupName -Location $Location -Tag @{ Provisioner = "SuperMaestro"; Purpose = "Testing"; ResourceOwner = "***REMOVED***" } -Verbose
+                New-AzResourceGroup -Name $ResourceGroupName -Location $Location -Tag @{ Provisioner = "SuperMaestro"; Purpose = "Testing"; ResourceOwner = "piotr.wachulec@ericsson.com" } -Verbose
             }
             else
             {
