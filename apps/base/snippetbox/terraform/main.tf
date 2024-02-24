@@ -48,19 +48,6 @@ data "terraform_remote_state" "environment" {
   }
 }
 
-# TODO: Add comments.
-data "atlas_schema" "default" {
-  src = file("templates/schema.hcl")
-
-  dev_url = join("", [
-    "mysql://root@",
-    kubernetes_service_v1.mysql_schema.metadata[0].name,
-    ".",
-    kubernetes_namespace_v1.default.metadata[0].name,
-    ".svc.cluster.local"
-  ])
-}
-
 locals {
   # Lookup and set the location abbreviation, defaults to na (not available).
   location_abbreviation = try(var.location_abbreviation[var.location], "na")
@@ -141,14 +128,8 @@ resource "azurerm_mysql_flexible_server_firewall_rule" "allow_all" {
   end_ip_address      = "255.255.255.255"
 }
 
-resource "time_sleep" "default" {
-  create_duration = "10s"
-
-  depends_on = [azurerm_mysql_flexible_server_firewall_rule.allow_all]
-}
-
-resource "atlas_schema" "default" {
-  hcl = data.atlas_schema.default.hcl
+data "atlas_schema" "default" {
+  src = file("templates/schema.hcl")
 
   dev_url = join("", [
     "mysql://root@",
@@ -157,6 +138,10 @@ resource "atlas_schema" "default" {
     kubernetes_namespace_v1.default.metadata[0].name,
     ".svc.cluster.local"
   ])
+}
+
+resource "atlas_schema" "default" {
+  hcl = data.atlas_schema.default.hcl
 
   url = join("", [
     "mysql://",
@@ -168,7 +153,7 @@ resource "atlas_schema" "default" {
     "?tls=preferred"
   ])
 
-  depends_on = [time_sleep.default]
+  depends_on = [azurerm_mysql_flexible_server_firewall_rule.allow_all]
 }
 
 # Create the Kubernetes namespace.
