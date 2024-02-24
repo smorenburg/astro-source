@@ -162,6 +162,8 @@ resource "kubernetes_namespace_v1" "default" {
       part-of = var.app
     }
   }
+
+  depends_on = [azurerm_mysql_flexible_server_firewall_rule.allow_all]
 }
 
 # Create the mysql-schema Kubernetes deployment.
@@ -261,11 +263,6 @@ resource "kubernetes_service_v1" "mysql_schema" {
       target_port = 3306
     }
   }
-
-  depends_on = [
-    kubernetes_deployment_v1.mysql_schema,
-    azurerm_mysql_flexible_server_firewall_rule.allow_all
-  ]
 }
 
 # Create the snipperbox Kubernetes deployment.
@@ -338,7 +335,7 @@ resource "kubernetes_deployment_v1" "snipperbox" {
     }
   }
 
-  depends_on = [azurerm_mysql_flexible_server_firewall_rule.allow_all]
+  depends_on = [atlas_schema.default]
 }
 
 # Create the snipperbox Kubernetes service.
