@@ -9,7 +9,7 @@ spec:
     customConfiguration: |
       backend "azurerm" {
         resource_group_name  = "rg-tfstate-astro-neu"
-        storage_account_name = "stastrop0ze8b"
+        storage_account_name = "stastro207983"
         container_name       = "tfstate"
         key                  = "snippetbox.production.northeurope.tfstate"
         use_oidc             = true
@@ -24,7 +24,7 @@ spec:
     - name: container_image
       value: smorenburg/snippetbox:0.0.6
     - name: ingress_rule_host
-      value: snippetbox.98.71.67.111.nip.io
+      value: snippetbox.52.169.209.83.nip.io
   runnerPodTemplate:
     spec:
       env:

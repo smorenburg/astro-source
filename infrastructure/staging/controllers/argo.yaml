@@ -7,8 +7,8 @@ metadata:
 spec:
   values:
     server:
-      authModes: [ server ]
+      authModes: [server]
     workflow:
       serviceAccount:
         annotations:
-          azure.workload.identity/client-id: 0078758b-4315-4a50-a3f8-0260bcee916c
+          azure.workload.identity/client-id: 82a5384b-661f-4890-9d06-9379e1c67430
