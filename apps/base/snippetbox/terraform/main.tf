@@ -129,7 +129,6 @@ resource "azurerm_mysql_flexible_server_firewall_rule" "allow_all" {
 }
 
 data "atlas_schema" "default" {
-  id  = "default"
   src = file("templates/schema.hcl")
 
   dev_url = join("", [
@@ -155,8 +154,6 @@ resource "atlas_schema" "default" {
     azurerm_mysql_flexible_server.default.fqdn,
     "?tls=preferred"
   ])
-
-  depends_on = [azurerm_mysql_flexible_server_firewall_rule.allow_all]
 }
 
 # Create the Kubernetes namespace.
