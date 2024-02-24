@@ -1,7 +1,7 @@
 variable "app" {
   description = "Optional. The name of the application."
   type        = string
-  default     = "snippetbox"
+  default     = "sb"
 }
 
 variable "location" {
@@ -13,7 +13,7 @@ variable "location" {
 variable "location_abbreviation" {
   description = "Optional. The abbreviation of the location."
   type        = map(string)
-  default     = {
+  default = {
     "westeurope"  = "weu"
     "northeurope" = "neu"
     "eastus"      = "eus"
@@ -31,7 +31,7 @@ variable "environment" {
 variable "environment_abbreviation" {
   description = "Optional. The abbreviation of the environment."
   type        = map(string)
-  default     = {
+  default = {
     "development" = "dev"
     "staging"     = "stage"
     "production"  = "prod"
