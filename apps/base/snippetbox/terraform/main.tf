@@ -8,6 +8,10 @@ terraform {
       version = ">= 3.6"
     }
 
+    time = {
+      version = ">= 0.10"
+    }
+
     kubernetes = {
       version = ">= 2.24"
     }
@@ -136,6 +140,12 @@ resource "azurerm_mysql_flexible_server_firewall_rule" "allow_all" {
   end_ip_address      = "255.255.255.255"
 }
 
+resource "time_sleep" "default" {
+  create_duration = "10s"
+
+  depends_on = [azurerm_mysql_flexible_server_firewall_rule.allow_all]
+}
+
 resource "atlas_schema" "default" {
   hcl     = data.atlas_schema.default.hcl
   dev_url = data.atlas_schema.default.dev_url
@@ -148,8 +158,6 @@ resource "atlas_schema" "default" {
     azurerm_mysql_flexible_server.default.fqdn,
     "?tls=preferred"
   ])
-
-  depends_on = [azurerm_mysql_flexible_server_firewall_rule.allow_all]
 }
 
 # Create the Kubernetes namespace.
@@ -262,10 +270,7 @@ resource "kubernetes_service_v1" "mysql_schema" {
     }
   }
 
-  depends_on = [
-    kubernetes_deployment_v1.mysql_schema,
-    azurerm_mysql_flexible_server_firewall_rule.allow_all
-  ]
+  depends_on = [time_sleep.default]
 }
 
 # Create the snippetbox Kubernetes deployment.
