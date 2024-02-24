@@ -129,6 +129,7 @@ resource "azurerm_mysql_flexible_server_firewall_rule" "allow_all" {
 }
 
 data "atlas_schema" "default" {
+  id  = "default"
   src = file("templates/schema.hcl")
 
   dev_url = join("", [
@@ -138,6 +139,8 @@ data "atlas_schema" "default" {
     kubernetes_namespace_v1.default.metadata[0].name,
     ".svc.cluster.local"
   ])
+
+  depends_on = [azurerm_mysql_flexible_server_firewall_rule.allow_all]
 }
 
 resource "atlas_schema" "default" {
