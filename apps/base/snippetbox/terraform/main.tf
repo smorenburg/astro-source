@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     azurerm = {
-      version = ">= 3.84"
+      version = ">= 3.93"
     }
 
     random = {
@@ -89,11 +89,8 @@ resource "random_password" "mysql_password" {
 }
 
 # Generate a random suffix for the Azure Database for MySQL flexible server.
-resource "random_string" "mysql" {
-  length  = 6
-  lower   = false
-  special = false
-  upper   = false
+resource "random_id" "mysql" {
+  byte_length = 2
 }
 
 resource "azurerm_key_vault_secret" "mysql_login" {
@@ -119,7 +116,7 @@ resource "azurerm_resource_group" "default" {
 }
 
 resource "azurerm_mysql_flexible_server" "default" {
-  name                   = "mysql-${var.app}-${local.environment_abbreviation}-${random_string.mysql.result}"
+  name                   = "mysql-${var.app}-${local.environment_abbreviation}-${random_id.mysql.hex}"
   resource_group_name    = azurerm_resource_group.default.name
   location               = var.location
   administrator_login    = random_pet.mysql_login.id
