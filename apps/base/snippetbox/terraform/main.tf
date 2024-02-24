@@ -271,6 +271,8 @@ resource "kubernetes_service_v1" "mysql_schema" {
       target_port = 3306
     }
   }
+
+  depends_on = [azurerm_mysql_flexible_server_firewall_rule.allow_all]
 }
 
 # Create the snippetbox Kubernetes deployment.
@@ -343,7 +345,7 @@ resource "kubernetes_deployment_v1" "snippetbox" {
     }
   }
 
-  depends_on = [azurerm_mysql_flexible_server_firewall_rule.allow_all]
+  depends_on = [atlas_schema.default]
 }
 
 # Create the snippetbox Kubernetes service.
