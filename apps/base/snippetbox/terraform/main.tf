@@ -337,6 +337,8 @@ resource "kubernetes_deployment_v1" "snipperbox" {
       }
     }
   }
+
+  depends_on = [azurerm_mysql_flexible_server_firewall_rule.allow_all]
 }
 
 # Create the snipperbox Kubernetes service.
