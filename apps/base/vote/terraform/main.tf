@@ -38,6 +38,7 @@ locals {
 # Generate a random suffix for the Azure Cache for Redis.
 resource "random_string" "redis" {
   length  = 6
+  lower   = false
   special = false
   upper   = false
 }

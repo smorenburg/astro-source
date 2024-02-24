@@ -46,7 +46,7 @@ data "terraform_remote_state" "environment" {
 
 # TODO: Add comments.
 data "atlas_schema" "default" {
-  src     = file("templates/schema.hcl")
+  src = file("templates/schema.hcl")
   dev_url = join("", [
     "mysql://root@",
     kubernetes_service_v1.mysql_schema.metadata[0].name,
@@ -91,6 +91,7 @@ resource "random_password" "mysql_password" {
 # Generate a random suffix for the Azure Database for MySQL flexible server.
 resource "random_string" "mysql" {
   length  = 6
+  lower   = false
   special = false
   upper   = false
 }
@@ -124,7 +125,7 @@ resource "azurerm_mysql_flexible_server" "default" {
   administrator_login    = random_pet.mysql_login.id
   administrator_password = random_password.mysql_password.result
   sku_name               = "B_Standard_B1s" # TODO: Add sku_name as a variable.
-  zone                   = "1" # TODO: Add high-availability.
+  zone                   = "1"              # TODO: Add high-availability.
 
   tags = {
     component = "database"
@@ -143,7 +144,7 @@ resource "azurerm_mysql_flexible_server_firewall_rule" "allow_all" {
 resource "atlas_schema" "default" {
   hcl     = data.atlas_schema.default.hcl
   dev_url = data.atlas_schema.default.dev_url
-  url     = join("", [
+  url = join("", [
     "mysql://",
     random_pet.mysql_login.id,
     ":",
