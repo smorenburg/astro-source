@@ -51,6 +51,7 @@ data "terraform_remote_state" "environment" {
 # TODO: Add comments.
 data "atlas_schema" "default" {
   src = file("templates/schema.hcl")
+
   dev_url = join("", [
     "mysql://root@",
     kubernetes_service_v1.mysql_schema.metadata[0].name,
@@ -147,8 +148,16 @@ resource "time_sleep" "default" {
 }
 
 resource "atlas_schema" "default" {
-  hcl     = data.atlas_schema.default.hcl
-  dev_url = data.atlas_schema.default.dev_url
+  hcl = data.atlas_schema.default.hcl
+
+  dev_url = join("", [
+    "mysql://root@",
+    kubernetes_service_v1.mysql_schema.metadata[0].name,
+    ".",
+    kubernetes_namespace_v1.default.metadata[0].name,
+    ".svc.cluster.local"
+  ])
+
   url = join("", [
     "mysql://",
     random_pet.mysql_login.id,
