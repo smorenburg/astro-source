@@ -9,7 +9,7 @@ spec:
     customConfiguration: |
       backend "azurerm" {
         resource_group_name  = "rg-tfstate-astro-neu"
-        storage_account_name = "stastro207983"
+        storage_account_name = "stastro8246"
         container_name       = "tfstate"
         key                  = "vote.production.northeurope.tfstate"
         use_oidc             = true
