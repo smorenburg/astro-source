@@ -162,8 +162,6 @@ resource "kubernetes_namespace_v1" "default" {
       part-of = var.app
     }
   }
-
-  depends_on = [azurerm_mysql_flexible_server_firewall_rule.allow_all]
 }
 
 # Create the mysql-schema Kubernetes deployment.
@@ -265,7 +263,8 @@ resource "kubernetes_service_v1" "mysql_schema" {
   }
 
   depends_on = [
-    kubernetes_deployment_v1.mysql_schema
+    kubernetes_deployment_v1.mysql_schema,
+    azurerm_mysql_flexible_server_firewall_rule.allow_all
   ]
 }
 
