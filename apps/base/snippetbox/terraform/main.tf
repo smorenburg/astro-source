@@ -158,6 +158,8 @@ resource "atlas_schema" "default" {
     azurerm_mysql_flexible_server.default.fqdn,
     "?tls=preferred"
   ])
+
+  depends_on = [time_sleep.default]
 }
 
 # Create the Kubernetes namespace.
@@ -269,8 +271,6 @@ resource "kubernetes_service_v1" "mysql_schema" {
       target_port = 3306
     }
   }
-
-  depends_on = [time_sleep.default]
 }
 
 # Create the snippetbox Kubernetes deployment.
@@ -343,7 +343,7 @@ resource "kubernetes_deployment_v1" "snippetbox" {
     }
   }
 
-  depends_on = [atlas_schema.default]
+  depends_on = [azurerm_mysql_flexible_server_firewall_rule.allow_all]
 }
 
 # Create the snippetbox Kubernetes service.
