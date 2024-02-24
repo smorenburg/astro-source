@@ -269,8 +269,8 @@ resource "kubernetes_service_v1" "mysql_schema" {
   ]
 }
 
-# Create the snipperbox Kubernetes deployment.
-resource "kubernetes_deployment_v1" "snipperbox" {
+# Create the snippetbox Kubernetes deployment.
+resource "kubernetes_deployment_v1" "snippetbox" {
   metadata {
     name      = var.app
     namespace = kubernetes_namespace_v1.default.metadata[0].name
@@ -342,8 +342,8 @@ resource "kubernetes_deployment_v1" "snipperbox" {
   depends_on = [atlas_schema.default]
 }
 
-# Create the snipperbox Kubernetes service.
-resource "kubernetes_service_v1" "snipperbox" {
+# Create the snippetbox Kubernetes service.
+resource "kubernetes_service_v1" "snippetbox" {
   metadata {
     name      = var.app
     namespace = kubernetes_namespace_v1.default.metadata[0].name
