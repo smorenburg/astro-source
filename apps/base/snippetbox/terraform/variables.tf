@@ -1,7 +1,7 @@
 variable "app" {
   description = "Optional. The name of the application."
   type        = string
-  default     = "sb"
+  default     = "snippetbox"
 }
 
 variable "location" {
