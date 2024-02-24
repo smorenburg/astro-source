@@ -58,6 +58,25 @@ locals {
   # Construct the name suffix.
   suffix = "${var.app}-${local.environment_abbreviation}-${local.location_abbreviation}"
 
+  # Construct the URLs for Atlas.
+  dev_url = join("", [
+    "mysql://root@",
+    kubernetes_service_v1.mysql_schema.metadata[0].name,
+    ".",
+    kubernetes_namespace_v1.default.metadata[0].name,
+    ".svc.cluster.local"
+  ])
+
+  url = join("", [
+    "mysql://",
+    random_pet.mysql_login.id,
+    ":",
+    urlencode(random_password.mysql_password.result),
+    "@",
+    azurerm_mysql_flexible_server.default.fqdn,
+    "?tls=preferred"
+  ])
+
   # Construct the data source name,
   dsn = join("", [
     random_pet.mysql_login.id,
@@ -129,31 +148,15 @@ resource "azurerm_mysql_flexible_server_firewall_rule" "allow_all" {
 }
 
 data "atlas_schema" "default" {
-  src = file("templates/schema.hcl")
-
-  dev_url = join("", [
-    "mysql://root@",
-    kubernetes_service_v1.mysql_schema.metadata[0].name,
-    ".",
-    kubernetes_namespace_v1.default.metadata[0].name,
-    ".svc.cluster.local"
-  ])
+  src     = file("templates/schema.hcl")
+  dev_url = local.dev_url
 
   depends_on = [azurerm_mysql_flexible_server_firewall_rule.allow_all]
 }
 
 resource "atlas_schema" "default" {
   hcl = data.atlas_schema.default.hcl
-
-  url = join("", [
-    "mysql://",
-    random_pet.mysql_login.id,
-    ":",
-    urlencode(random_password.mysql_password.result),
-    "@",
-    azurerm_mysql_flexible_server.default.fqdn,
-    "?tls=preferred"
-  ])
+  url = local.url
 }
 
 # Create the Kubernetes namespace.
