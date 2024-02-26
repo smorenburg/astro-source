@@ -8,4 +8,4 @@ spec:
   values:
     controller:
       service:
-        loadBalancerIP: "52.169.209.83"
+        loadBalancerIP: "52.169.10.16"
