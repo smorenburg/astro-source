@@ -4,6 +4,12 @@ variable "app" {
   default     = "snippetbox"
 }
 
+variable "app_abbreviation" {
+  description = "Optional. The name abbreviation of the application."
+  type        = string
+  default     = "sbox"
+}
+
 variable "location" {
   description = "Optional. The location (region) for the resources."
   type        = string

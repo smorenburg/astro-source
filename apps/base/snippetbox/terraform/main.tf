@@ -56,7 +56,7 @@ locals {
   environment_abbreviation = try(var.environment_abbreviation[var.environment], "na")
 
   # Construct the name suffix.
-  suffix = "${var.app}-${local.environment_abbreviation}-${local.location_abbreviation}"
+  suffix = "${var.app_abbreviation}-${local.environment_abbreviation}-${local.location_abbreviation}"
 
   # Construct the URLs for Atlas.
   dev_url = join("", [
@@ -103,13 +103,13 @@ resource "random_id" "mysql" {
 }
 
 resource "azurerm_key_vault_secret" "mysql_login" {
-  name         = "${var.app}-mysql-login"
+  name         = "${var.app_abbreviation}-mysql-login"
   value        = random_pet.mysql_login.id
   key_vault_id = data.terraform_remote_state.environment.outputs.azurerm_key_vault_default_id
 }
 
 resource "azurerm_key_vault_secret" "mysql_password" {
-  name         = "${var.app}-mysql-password"
+  name         = "${var.app_abbreviation}-mysql-password"
   value        = random_password.mysql_password.result
   key_vault_id = data.terraform_remote_state.environment.outputs.azurerm_key_vault_default_id
 }
@@ -125,7 +125,7 @@ resource "azurerm_resource_group" "default" {
 }
 
 resource "azurerm_mysql_flexible_server" "default" {
-  name                   = "mysql-${var.app}-${local.environment_abbreviation}-${random_id.mysql.hex}"
+  name                   = "mysql-${var.app_abbreviation}-${local.environment_abbreviation}-${random_id.mysql.hex}"
   resource_group_name    = azurerm_resource_group.default.name
   location               = var.location
   administrator_login    = random_pet.mysql_login.id
